@@ -1,0 +1,66 @@
+/* Hover and Focus Styles */
+.header-action-btn:hover, .header-action-btn:focus {
+  color: green; /* Change to the desired color on hover and focus */
+}
+
+.header-action-btn:hover ion-icon, .header-action-btn:focus ion-icon {
+  color: green; /* Ensure the icon changes color on hover and focus */
+}
+
+.header-action-btn:hover .user-name, .header-action-btn:focus .user-name {
+  color: green; /* Ensure the text changes color on hover and focus */
+}
+
+/* .dropdown{
+	display: none;	
+} */
+
+/* .dropdown .dropdown_pro .dropdown_log{
+	display: block;
+	padding: 20px 25px;
+	color: #FFF;
+	text-decoration: none;
+	text-align: center;
+	font-size: 20px;
+} */
+
+.header-action-btn .dropdown {
+    display: none; /* Hide dropdown by default */
+    position: absolute;
+    width: 106px;
+    top: 100%; /* Position below the button */
+    left: -28px;
+    background-color: var(--white); /* Dropdown background color */
+    box-shadow: var(--shadow-1); /* Add some shadow for depth */
+    border-radius: var(--radius-3); /* Rounded corners */
+    padding: 10px 0;
+    z-index: 1000; /* Ensure dropdown is above other content */
+}
+
+.header-action-btn:hover .dropdown,
+.header-action-btn:focus .dropdown {
+    display: block; /* Show dropdown on hover */
+}
+
+.header-action-btn .dropdown li {
+    list-style: none; /* Remove default list styling */
+}
+
+.header-action-btn .dropdown li a {
+    display: block;
+    padding: 10px 20px;
+    color: var(--eerie-black-1); /* Link color */
+    text-decoration: none;
+}
+
+.header-action-btn .dropdown li a:hover,
+.header-action-btn .dropdown li a:focus {
+    background-color: var(--kappel); /* Highlight on hover */
+    color: var(--white); /* Text color on hover */
+}
+
+/* Additional hover and focus styles for the button */
+.header-action-btn:hover,
+.header-action-btn:focus {
+    color: var(--kappel); /* Change color on hover and focus */
+}
