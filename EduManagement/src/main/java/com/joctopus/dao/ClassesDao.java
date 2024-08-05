@@ -20,4 +20,6 @@ public interface ClassesDao {
 	boolean isClassNameExists(String account) throws SQLException;
 	
 	Classes getClassById(int id);
+	
+	 public List<Classes> selectClassesByStatus(String status);
 }

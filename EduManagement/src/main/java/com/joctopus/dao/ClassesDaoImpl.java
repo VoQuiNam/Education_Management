@@ -183,5 +183,30 @@ public class ClassesDaoImpl implements ClassesDao{
 	        }
 	        return classes;
 	    }
+	 
+	 @SuppressWarnings("unchecked")
+	 @Override
+	 public List<Classes> selectClassesByStatus(String status) {
+	     Transaction transaction = null;
+	     List<Classes> classes = null;
+	     Session session = HibernateUtil.getSessionFactory().openSession();
+	     try {
+	         transaction = session.beginTransaction();
+	         if (status == null || status.isEmpty() || status.equalsIgnoreCase("All")) {
+	             classes = session.createQuery("from Classes").getResultList();
+	         } else {
+	             classes = session.createQuery("from Classes where status = :status")
+	                              .setParameter("status", status)
+	                              .getResultList();
+	         }
+	         transaction.commit();
+	     } catch (Exception e) {
+	         if (transaction != null) {
+	             transaction.rollback();
+	         }
+	         e.printStackTrace();
+	     }
+	     return classes;
+	 }
 
 }
