@@ -21,6 +21,11 @@
 <link
 	href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700;800&family=Poppins:wght@400;500&display=swap"
 	rel="stylesheet">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<link
+	href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700;800&family=Poppins:wght@400;500&display=swap"
+	rel="stylesheet">
 <link rel="preload" as="image"
 	href="<c:url value='/images/hero-bg.svg'/>">
 <link rel="preload" as="image"
@@ -32,15 +37,58 @@
 <link rel="preload" as="image"
 	href="<c:url value='/images/hero-shape-2.svg'/>">
 <style>
+.filter-container {
+	position: relative;
+	top: 138px;
+	text-align: right;
+}
+
+.filter-dropdown {
+	display: none;
+	position: absolute;
+	top: 40px;
+	right: 0;
+	background-color: white;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+	z-index: 1000;
+}
+
+.filter-dropdown .filter-option {
+	padding: 10px;
+	display: block;
+	color: black;
+	text-decoration: none;
+}
+
+.filter-dropdown .filter-option:hover {
+	background-color: #f1f1f1;
+}
+
+.filter-icon {
+	cursor: pointer;
+	font-size: 24px;
+}
 </style>
 </head>
 <body id="top">
 	<c:import url="/WEB-INF/fragments/menuclient.jsp" />
 
 	<div class="tutor-classes-container">
-		<h1>Find a Tutor Class</h1>
+
+		<div class="filter-container">
+			<i class="fas fa-filter filter-icon" id="filter-icon"></i>
+			<div class="filter-dropdown" id="filter-dropdown">
+				<a href="#" data-status="All" class="filter-option">All</a> <a
+					href="#" data-status="New" class="filter-option">New</a> <a
+					href="#" data-status="Teaching" class="filter-option">Teaching</a>
+				<a href="#" data-status="Success" class="filter-option">Success</a>
+			</div>
+		</div>
+
 		<a type="button" class="create-btn"
-			href="<%=request.getContextPath()%>/FindTutorClassController?action=/newClass">Create
+			href="<%=request.getContextPath()%>/FindTutorClassController?action=/newClass" style="margin-top: 73px;">Create
 			Class</a>
 		<ul class="tutor-classes-list">
 			<c:forEach var="classes" items="${listClass}">
@@ -104,10 +152,38 @@
 		</ul>
 	</div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.cancel-btn').forEach(function(button) {
-        button.addEventListener('click', function(event) {
+	<script>
+
+document.addEventListener('DOMContentLoaded', function () {
+    attachEventListeners(); // Initial attachment of event listeners
+
+    // Check for success or error message in session
+    <c:if test="${not empty sessionScope.successMessage}">
+        Swal.fire({
+            title: 'Success',
+            text: '${sessionScope.successMessage}',
+            icon: 'success'
+        });
+        <c:remove var="successMessage" scope="session"/>
+    </c:if>
+
+    <c:if test="${not empty sessionScope.errorMessage}">
+        Swal.fire({
+            title: 'Error',
+            text: '${sessionScope.errorMessage}',
+            icon: 'error'
+        });
+        <c:remove var="errorMessage" scope="session"/>
+    </c:if>
+});
+
+//Đính kèm lại trình xử lý sự kiện: Bạn cần đính kèm lại trình xử 
+//lý sự kiện cho nút "Xác nhận" và "Hủy" mỗi khi danh sách lớp được cập nhật. 
+//Bạn có thể đạt được điều này bằng cách di chuyển logic đính kèm của 
+//trình nghe sự kiện vào một hàm riêng biệt và gọi nó sau khi danh sách lớp được cập nhật.(nếu ko đính kèm thì sự kiện lắng nghe sẽ bị xóa)
+function attachEventListeners() {
+    document.querySelectorAll('.cancel-btn').forEach(function (button) {
+        button.addEventListener('click', function (event) {
             event.preventDefault();
             const classId = this.getAttribute('data-class-id');
             Swal.fire({
@@ -128,8 +204,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    document.querySelectorAll('.confirm').forEach(function(button) {
-        button.addEventListener('click', function(event) {
+    document.querySelectorAll('.confirm').forEach(function (button) {
+        button.addEventListener('click', function (event) {
             event.preventDefault();
             const classId = this.getAttribute('data-class-id');
             Swal.fire({
@@ -149,7 +225,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             'Content-Type': 'application/x-www-form-urlencoded',
                         },
                         body: new URLSearchParams({
-                            action: 'ConfirmTeach',
+                            action: 'confirmTeach',
                             id: classId
                         })
                     })
@@ -166,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         } else {
                             let errorMessage = 'There was a problem sending the notification.';
                             if (status === 400) {
-                                errorMessage = 'Requires a registered instructor.';
+                                errorMessage = 'Requires registered students.';
                             } else if (status === 403) {
                                 errorMessage = 'Only the creator of the class can confirm it.';
                             }
@@ -189,25 +265,47 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
+}
 
-    // Check for success or error message in session
-    <c:if test="${not empty sessionScope.successMessage}">
-        Swal.fire({
-            title: 'Success',
-            text: '${sessionScope.successMessage}',
-            icon: 'success'
-        });
-        <c:remove var="successMessage" scope="session"/>
-    </c:if>
+document.addEventListener('DOMContentLoaded', function () {
+    const filterIcon = document.getElementById('filter-icon');
+    const filterDropdown = document.getElementById('filter-dropdown');
+    const filterOptions = document.querySelectorAll('.filter-option');
 
-    <c:if test="${not empty sessionScope.errorMessage}">
-        Swal.fire({
-            title: 'Error',
-            text: '${sessionScope.errorMessage}',
-            icon: 'error'
+    // Toggle the filter dropdown
+    filterIcon.addEventListener('click', function () {
+        filterDropdown.style.display = filterDropdown.style.display === 'block' ? 'none' : 'block';
+    });
+
+    // Apply filter when an option is selected
+    filterOptions.forEach(option => {
+        option.addEventListener('click', function (event) {
+            event.preventDefault();
+            const status = this.getAttribute('data-status');
+
+            // Update the page with the selected status
+            updateClasses(status);
+
+            // Close the dropdown
+            filterDropdown.style.display = 'none';
         });
-        <c:remove var="errorMessage" scope="session"/>
-    </c:if>
+    });
+
+    function updateClasses(status) {
+        fetch('<%=request.getContextPath()%>/FindTutorClassController?action=filterClasses&status=' + encodeURIComponent(status))
+            .then(response => response.text())
+            .then(data => {
+                // Update only the class list part of the page
+                const parser = new DOMParser();
+                const htmlDoc = parser.parseFromString(data, 'text/html');
+                const newClassList = htmlDoc.querySelector('.tutor-classes-list');
+                document.querySelector('.tutor-classes-list').innerHTML = newClassList.innerHTML;
+
+                // Re-attach event listeners to the new elements
+                attachEventListeners();
+            })
+            .catch(error => console.error('Error:', error));
+    }
 });
 </script>
 

@@ -57,6 +57,9 @@ public class FindTutorClassController extends HttpServlet {
 	                case "registerClass": // Assuming this is the action for registering a class
 	                    registerClass(request, response);
 	                    break;
+	                case "filterClasses":
+	    	            filterClasses(request, response);
+	    	            break;	
 	                default:
 	                    listClasses(request, response);
 	                    break;
@@ -86,6 +89,21 @@ public class FindTutorClassController extends HttpServlet {
 	            throw new ServletException(ex);
 	        }
 	    }
+	 
+	 
+	 private void filterClasses(HttpServletRequest request, HttpServletResponse response)
+		        throws SQLException, IOException, ServletException {
+		 	String status = request.getParameter("status");
+		    List<Classes> filteredClasses;
+		    if (status == null || status.isEmpty() || status.equalsIgnoreCase("All")) {
+		        filteredClasses = classesDao.selectAllClasses();
+		    } else {
+		        filteredClasses = classesDao.selectClassesByStatus(status);
+		    }
+		    request.setAttribute("listClass", filteredClasses);
+		    RequestDispatcher dispatcher = request.getRequestDispatcher("FindTutorClass/index.jsp");
+		    dispatcher.forward(request, response);
+	}
 	
 	 private void listClasses(HttpServletRequest request, HttpServletResponse response)
 	            throws SQLException, IOException, ServletException {
