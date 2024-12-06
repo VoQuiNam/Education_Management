@@ -43,6 +43,8 @@ public class HibernateUtil {
 				configuration.addAnnotatedClass(com.joctopus.model.Classes.class);
 				configuration.addAnnotatedClass(com.joctopus.model.Ucl.class);
 				configuration.addAnnotatedClass(com.joctopus.model.Notification.class);
+				configuration.addAnnotatedClass(com.joctopus.model.Notification_clients.class);
+				configuration.addAnnotatedClass(com.joctopus.model.Banner.class);
 				// thể cần ánh xạ.
 
 				ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()

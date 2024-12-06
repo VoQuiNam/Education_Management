@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Session;
@@ -13,11 +14,44 @@ import com.joctopus.model.Classes;
 import com.joctopus.model.Ucl;
 import com.joctopus.model.User;
 import com.joctopus.util.HibernateUtil;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 
 public class ClassesDaoImpl implements ClassesDao{
 	private Connection connection;
 	public ClassesDaoImpl() {
 	}
+	
+	@Override
+	public List<Classes> searchClassesByName(String className) {
+	    Transaction transaction = null;
+	    List<Classes> classesList = null;
+	    Session session = HibernateUtil.getSessionFactory().openSession();
+	    
+	    try {
+	        // Start a transaction
+	        transaction = session.beginTransaction();
+	        
+	        // Perform the search query
+	        //nó sẽ truy vấn giá trị nhập vào tìm kiếm từ :classname
+	        classesList = session.createQuery("from Classes where class_name like :class_name", Classes.class)
+	                             .setParameter("class_name", "%" + className + "%")
+	                             .getResultList();
+	        
+	        // Commit transaction
+	        transaction.commit();
+	    } catch (Exception e) {
+	        if (transaction != null) {
+	            transaction.rollback();
+	        }
+	        e.printStackTrace();
+	    } finally {
+	        session.close();
+	    }
+	    return classesList;
+	}
+
 	
 	@SuppressWarnings("deprecation")
 	@Override
@@ -108,6 +142,16 @@ public class ClassesDaoImpl implements ClassesDao{
             e.printStackTrace();
         }
     }
+	
+	public Classes getClassesById(int id) throws SQLException {
+	    try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+	        return session.get(Classes.class, id);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        throw new SQLException("Không thể lấy thông tin lớp học.");
+	    }
+	}
+
 
 	
 	@Override
@@ -208,5 +252,7 @@ public class ClassesDaoImpl implements ClassesDao{
 	     }
 	     return classes;
 	 }
+	 
 
+	 
 }

@@ -24,11 +24,14 @@ public interface UserDao {
 	 
 	 User getUserByAccount(String account) throws SQLException;
 	 
-	 List<User> selectUsersByType(String type);
+	 List<User> selectAdminUsers();
 	 
 	 void insertUcl(Ucl ucl) throws SQLException;
 	 
 	 boolean isUserRegisteredForClass(User user, Classes classes) throws SQLException;
+	 
+	 public boolean checkIfUserHasClasses(int userId) throws SQLException;
+	 public boolean checkIfUserIsEnrolledInClass(int userId);
 	 
 	 
 }

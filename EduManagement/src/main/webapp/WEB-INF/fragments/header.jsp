@@ -27,5 +27,6 @@
   <link rel="stylesheet" href="<c:url value='/css/summernote-bs4.min.css'/>">
    <!-- main -->
   <link rel="stylesheet" href="<c:url value='/css/main.css'/>">
+  <link rel="stylesheet" href="<c:url value='/css/search.css'/>">
   
 </head>

@@ -56,6 +56,24 @@ public class NotificationDaoImpl implements NotificationDao {
         }
         return notifications;
     }
+    
+    @Override
+    public List<Notification> selectNotificationsByUserId(int userId) {
+        Session session = sessionFactory.openSession();
+        List<Notification> notifications = null;
+        try {
+            String hql = "FROM Notification n WHERE n.user_id.id = :userId";
+            notifications = session.createQuery(hql, Notification.class)
+                                   .setParameter("userId", userId)
+                                   .list();
+        } catch (Exception e) {
+            e.printStackTrace(); // Replace with a logger
+        } finally {
+            session.close();
+        }
+        return notifications;
+    }
+
 
     @Override
     public void markAsRead(int notificationId) {
@@ -85,7 +103,7 @@ public class NotificationDaoImpl implements NotificationDao {
         try (Session session = sessionFactory.openSession()) {
             Transaction transaction = session.beginTransaction();
             try {
-                Notification notification = session.get(Notification.class, notificationId);
+            	Notification notification = session.get(Notification.class, notificationId);
                 if (notification != null) {
                     session.delete(notification);
                 }
@@ -98,6 +116,7 @@ public class NotificationDaoImpl implements NotificationDao {
             }
         }
     }
+    
     
    
  

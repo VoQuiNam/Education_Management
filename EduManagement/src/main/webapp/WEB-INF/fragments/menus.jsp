@@ -1,3 +1,6 @@
+<%@page import="com.joctopus.model.Notification_clients"%>
+<%@page import="com.joctopus.dao.NotificationAdminDaoImpl"%>
+<%@page import="com.joctopus.dao.NotificationAdminDao"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -5,11 +8,11 @@
 <%@ page import="java.util.List"%>
 <%@ page import="com.joctopus.model.Notification"%>
 <%@ page import="com.joctopus.dao.NotificationDao"%>
-<%@ page import="com.joctopus.dao.NotificationDaoImpl"%>
+<%@ page import="com.joctopus.dao.NotificationAdminDaoImpl"%>
 
 <%
-NotificationDao notificationDao = new NotificationDaoImpl();
-List<Notification> notifications = notificationDao.selectAllNotifications();
+NotificationAdminDao notificationDao = new NotificationAdminDaoImpl();
+List<Notification_clients> notifications = notificationDao.selectAllNotifications();
 request.setAttribute("notifications", notifications);
 %>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -169,8 +172,14 @@ request.setAttribute("notifications", notifications);
                 </li>
                 <li class="nav-item">
                     <a href="<%=request.getContextPath()%>/ClassesUserController?action=/listUCL" class="nav-link">
-                        <i class="fas fa-chalkboard"></i>
-                        <p style="margin-left: 9px;">User Detail</p>
+                        <i class="nav-icon fas fa-chalkboard"></i>
+                        <p>User Detail</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<%=request.getContextPath()%>/BannerController?action=/listBanner" class="nav-link">
+                        <i class="nav-icon fas fa-image"></i>
+                        <p>Banner</p>
                     </a>
                 </li>
             </ul>
@@ -195,10 +204,12 @@ request.setAttribute("notifications", notifications);
             event.stopPropagation();
             var notificationId = $(this).data('notification-id');
             var $notificationItem = $(this).closest('.notification-item');
-
+            
+            console.log('id : ',notificationId);
+			
             // Send AJAX request to server to remove the notification
             $.ajax({
-                url: '<%=request.getContextPath()%>/NotificationController', // Update this URL with your actual controller endpoint
+                url: '<%=request.getContextPath()%>/NotificationAdminController', // Update this URL with your actual controller endpoint
                 method: 'POST',
                 data: { action: 'remove', id: notificationId },
                 success: function(response) {
@@ -213,7 +224,7 @@ request.setAttribute("notifications", notifications);
                     $('.notification-count').text(newCount);
                     
                     // If no notifications left, show "No Notifications" but keep the header
-                    if (newCount === 0) {
+                    if (newCount == 0) {
                         $('.dropdown-menu').html('<span class="dropdown-item dropdown-header">No Notifications</span>');
                         $('.navbar-badge').text(0);
                     }
@@ -222,6 +233,7 @@ request.setAttribute("notifications", notifications);
                     alert('Error removing notification.');
                 }
             });
+            $(this).closest('.notification-item').remove();
         });
     });
 </script>

@@ -14,9 +14,12 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import com.joctopus.dao.ClassesDao;
 import com.joctopus.dao.ClassesDaoImpl;
+import com.joctopus.dao.NotificationDao;
+import com.joctopus.dao.NotificationDaoImpl;
 import com.joctopus.dao.UserDao;
 import com.joctopus.dao.UserDaoImpl;
 import com.joctopus.model.Classes;
+import com.joctopus.model.Notification;
 import com.joctopus.model.User;
 
 @WebServlet("/ClassesController")
@@ -24,10 +27,12 @@ public class ClassesController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private ClassesDao classesDao;
 	private UserDao userDao;
+	private NotificationDao notificationDao;
 
 	public void init() {
 		this.classesDao = new ClassesDaoImpl();
 		this.userDao = new UserDaoImpl();
+		this.notificationDao = new NotificationDaoImpl();
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -193,152 +198,162 @@ public class ClassesController extends HttpServlet {
 		int userId = Integer.parseInt(userIdParam);
 		User user = userDao.selectUser(userId);
 
-		Classes newClasses = new Classes(class_name, eduClass, study_time, subject, address, session, status, requeststatus, user);
+		Classes newClasses = new Classes(class_name, eduClass, study_time, subject, address, session, status,
+				requeststatus, user);
 		classesDao.insertClasses(newClasses);
 
 		response.sendRedirect("ClassesController?action=/listCl");
 	}
 
-	
 	private void updateClasses(HttpServletRequest request, HttpServletResponse response)
-	        throws SQLException, IOException, ServletException {
-	    boolean hasError = false; // Variable to check if any errors were detected
+			throws SQLException, IOException, ServletException {
+		boolean hasError = false; // Variable to check if any errors were detected
 
-	    int id = Integer.parseInt(request.getParameter("id"));
-	    String class_name = request.getParameter("class_name");
-	    Classes currentClass = classesDao.selectClasses(id);
-	    String eduClass = request.getParameter("class");
-	    String timeParam = request.getParameter("study_time");
-	    String subject = request.getParameter("subject");
-	    String address = request.getParameter("address");
-	    String session = request.getParameter("session");
-	    String status = request.getParameter("status");
-	    String requeststatus = request.getParameter("requeststatus");
-	    String numberOfStudentsParam = request.getParameter("numberOfStudents");
-	    String userIdParam = request.getParameter("users");
+		int id = Integer.parseInt(request.getParameter("id"));
+		String class_name = request.getParameter("class_name");
+		Classes currentClass = classesDao.selectClasses(id);
+		String eduClass = request.getParameter("class");
+		String timeParam = request.getParameter("study_time");
+		String subject = request.getParameter("subject");
+		String address = request.getParameter("address");
+		String session = request.getParameter("session");
+		String status = request.getParameter("status");
+		String requeststatus = request.getParameter("requeststatus");
+		String numberOfStudentsParam = request.getParameter("numberOfStudents");
+		String userIdParam = request.getParameter("users");
 
-	    if (class_name.isEmpty()) {
-	        // Store error message in request attribute for class name
-	        request.setAttribute("class_name_error", "Class name cannot be blank.");
-	        // Set hasError to true to indicate an error was detected
-	        hasError = true;
-	    } else {
-	        // Check the length of the class name
-	        if (class_name.length() < 2 || class_name.length() > 50) {
-	            // Store error message in request attribute for class name
-	            request.setAttribute("class_name_error", "The class name must be between 2 and 50 characters.");
-	            // Set hasError to true to indicate an error was detected
-	            hasError = true;
-	        }
-	    }
+		if (class_name.isEmpty()) {
+			// Store error message in request attribute for class name
+			request.setAttribute("class_name_error", "Class name cannot be blank.");
+			// Set hasError to true to indicate an error was detected
+			hasError = true;
+		} else {
+			// Check the length of the class name
+			if (class_name.length() < 2 || class_name.length() > 50) {
+				// Store error message in request attribute for class name
+				request.setAttribute("class_name_error", "The class name must be between 2 and 50 characters.");
+				// Set hasError to true to indicate an error was detected
+				hasError = true;
+			}
+		}
 
-	    if (!class_name.equals(currentClass.getClass_name()) && classesDao.isClassNameExists(class_name)) {
-	        // Store error message in request attribute for class name
-	        request.setAttribute("class_name_error", "This class name already exists. Please choose another one.");
-	        // Set hasError to true to indicate an error was detected
-	        hasError = true;
-	    }
+		if (!class_name.equals(currentClass.getClass_name()) && classesDao.isClassNameExists(class_name)) {
+			// Store error message in request attribute for class name
+			request.setAttribute("class_name_error", "This class name already exists. Please choose another one.");
+			// Set hasError to true to indicate an error was detected
+			hasError = true;
+		}
 
-	    if (eduClass.isEmpty()) {
-	        // Store error message in request attribute for eduClass
-	        request.setAttribute("class_error", "Class cannot be blank.");
-	        // Set hasError to true to indicate an error was detected
-	        hasError = true;
-	    }
+		if (eduClass.isEmpty()) {
+			// Store error message in request attribute for eduClass
+			request.setAttribute("class_error", "Class cannot be blank.");
+			// Set hasError to true to indicate an error was detected
+			hasError = true;
+		}
 
-	    LocalDate study_time;
-	    if (timeParam != null && !timeParam.isEmpty()) {
-	        study_time = LocalDate.parse(timeParam);
-	    } else {
-	        study_time = LocalDate.now(); // or any other default date you prefer
-	    }
+		LocalDate study_time;
+		if (timeParam != null && !timeParam.isEmpty()) {
+			study_time = LocalDate.parse(timeParam);
+		} else {
+			study_time = LocalDate.now(); // or any other default date you prefer
+		}
 
-	    if (subject.isEmpty()) {
-	        // Store error message in request attribute for subject
-	        request.setAttribute("subject_error", "Subject cannot be blank.");
-	        // Set hasError to true to indicate an error was detected
-	        hasError = true;
-	    } else {
-	        // Check the length of the subject
-	        if (subject.length() < 2 || subject.length() > 50) {
-	            // Store error message in request attribute for subject
-	            request.setAttribute("subject_error", "The subject must be between 2 and 50 characters.");
-	            // Set hasError to true to indicate an error was detected
-	            hasError = true;
-	        }
-	        if (subject.matches(".*\\d.*")) {
-	            // Check if subject contains only numbers
-	            request.setAttribute("subject_error", "Subject cannot be a number.");
-	            hasError = true;
-	        }
-	    }
+		if (subject.isEmpty()) {
+			// Store error message in request attribute for subject
+			request.setAttribute("subject_error", "Subject cannot be blank.");
+			// Set hasError to true to indicate an error was detected
+			hasError = true;
+		} else {
+			// Check the length of the subject
+			if (subject.length() < 2 || subject.length() > 50) {
+				// Store error message in request attribute for subject
+				request.setAttribute("subject_error", "The subject must be between 2 and 50 characters.");
+				// Set hasError to true to indicate an error was detected
+				hasError = true;
+			}
+			if (subject.matches(".*\\d.*")) {
+				// Check if subject contains only numbers
+				request.setAttribute("subject_error", "Subject cannot be a number.");
+				hasError = true;
+			}
+		}
 
-	    if (address.isEmpty()) {
-	        // Store error message in request attribute for address
-	        request.setAttribute("address_error", "Address cannot be blank.");
-	        // Set hasError to true to indicate an error was detected
-	        hasError = true;
-	    } else {
-	        // Check the length of the address
-	        if (address.length() < 2 || address.length() > 50) {
-	            // Store error message in request attribute for address
-	            request.setAttribute("address_error", "The address must be between 2 and 50 characters.");
-	            // Set hasError to true to indicate an error was detected
-	            hasError = true;
-	        }
-	    }
+		if (address.isEmpty()) {
+			// Store error message in request attribute for address
+			request.setAttribute("address_error", "Address cannot be blank.");
+			// Set hasError to true to indicate an error was detected
+			hasError = true;
+		} else {
+			// Check the length of the address
+			if (address.length() < 2 || address.length() > 50) {
+				// Store error message in request attribute for address
+				request.setAttribute("address_error", "The address must be between 2 and 50 characters.");
+				// Set hasError to true to indicate an error was detected
+				hasError = true;
+			}
+		}
 
-	    if (session == null || session.isEmpty()) {
-	        // Store error message in request attribute for session
-	        request.setAttribute("session_error", "Please select a session.");
-	        // Set hasError to true to indicate an error was detected
-	        hasError = true;
-	    }
+		if (session == null || session.isEmpty()) {
+			// Store error message in request attribute for session
+			request.setAttribute("session_error", "Please select a session.");
+			// Set hasError to true to indicate an error was detected
+			hasError = true;
+		}
 
-	    if (status == null || status.isEmpty()) {
-	        // Store error message in request attribute for status
-	        request.setAttribute("status_error", "Please select a status.");
-	        // Set hasError to true to indicate an error was detected
-	        hasError = true;
-	    }
+		if (status == null || status.isEmpty()) {
+			// Store error message in request attribute for status
+			request.setAttribute("status_error", "Please select a status.");
+			// Set hasError to true to indicate an error was detected
+			hasError = true;
+		}
 
-	    int numberOfStudents = 0;
-	    if (numberOfStudentsParam != null && !numberOfStudentsParam.isEmpty()) {
-	        try {
-	            numberOfStudents = Integer.parseInt(numberOfStudentsParam);
-	        } catch (NumberFormatException e) {
-	            // Store error message in request attribute for numberOfStudents
-	            request.setAttribute("numberOfStudents_error", "Number of students must be a valid number.");
-	            hasError = true;
-	        }
-	    }
+		int numberOfStudents = 0;
+		if (numberOfStudentsParam != null && !numberOfStudentsParam.isEmpty()) {
+			try {
+				numberOfStudents = Integer.parseInt(numberOfStudentsParam);
+			} catch (NumberFormatException e) {
+				// Store error message in request attribute for numberOfStudents
+				request.setAttribute("numberOfStudents_error", "Number of students must be a valid number.");
+				hasError = true;
+			}
+		}
 
-	    // Get user ID from request
-	    if (userIdParam == null || userIdParam.isEmpty()) {
-	        // Store error message in request attribute for user ID
-	        request.setAttribute("userId_error", "Please select a user.");
-	        // Set hasError to true to indicate an error was detected
-	        hasError = true;
-	    }
+		// Get user ID from request
+		if (userIdParam == null || userIdParam.isEmpty()) {
+			// Store error message in request attribute for user ID
+			request.setAttribute("userId_error", "Please select a user.");
+			// Set hasError to true to indicate an error was detected
+			hasError = true;
+		}
 
-	    if (hasError) {
-	        List<User> listUser = userDao.selectAllUsers();
-	        request.setAttribute("listUser", listUser);
-	        request.setAttribute("class", currentClass);
-	        RequestDispatcher dispatcher = request.getRequestDispatcher("Classes/classes_form.jsp");
-	        dispatcher.forward(request, response);
-	        return;
-	    }
+		if (hasError) {
+			List<User> listUser = userDao.selectAllUsers();
+			request.setAttribute("listUser", listUser);
+			request.setAttribute("class", currentClass);
+			RequestDispatcher dispatcher = request.getRequestDispatcher("Classes/classes_form.jsp");
+			dispatcher.forward(request, response);
+			return;
+		}
 
-	    int userId = Integer.parseInt(userIdParam);
-	    User user = userDao.selectUser(userId);
-	    Classes updateClass = new Classes(id, class_name, eduClass, study_time, subject, address, session, status, numberOfStudents,requeststatus, user);
+		int userId = Integer.parseInt(userIdParam);
+		User user = userDao.selectUser(userId);
+		Classes updateClass = new Classes(id, class_name, eduClass, study_time, subject, address, session, status,
+				numberOfStudents, requeststatus, user);
 
-	    classesDao.updateClasses(updateClass);
+		classesDao.updateClasses(updateClass);
 
-	    response.sendRedirect("ClassesController?action=/listCl");
+		if ("Approved".equals(requeststatus)) {
+			List<User> admins = userDao.selectAdminUsers();
+			for (User admin : admins) {
+				Notification notification = new Notification();
+				notification.setMessage("The class \"" + class_name + "\" has been successfully approved");
+				notification.setUserId(user); // Set admin user ID
+				notificationDao.insertNotification(notification); // Insert notification
+			}
+		}
+
+		response.sendRedirect("ClassesController?action=/listCl");
 	}
-
 
 	private void showEditForm(HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, ServletException, IOException {
@@ -347,16 +362,44 @@ public class ClassesController extends HttpServlet {
 		List<User> listUser = userDao.selectAllUsers();
 		request.setAttribute("Classes", existingcls);
 		request.setAttribute("listUser", listUser);
-		
+
 		RequestDispatcher dispatcher = request.getRequestDispatcher("/Classes/classes_form.jsp");
 		dispatcher.forward(request, response);
 	}
 
+	/*
+	 * private void deleteClasses(HttpServletRequest request, HttpServletResponse
+	 * response) throws SQLException, IOException { int id =
+	 * Integer.parseInt(request.getParameter("id")); // Sử dụng long ở đây
+	 * classesDao.deleteClasses(id);
+	 * response.sendRedirect("ClassesController?action=/listCl"); }
+	 */
+
 	private void deleteClasses(HttpServletRequest request, HttpServletResponse response)
-			throws SQLException, IOException {
-		int id = Integer.parseInt(request.getParameter("id")); // Sử dụng long ở đây
-		classesDao.deleteClasses(id);
-		response.sendRedirect("ClassesController?action=/listCl");
+	        throws SQLException, IOException {
+	    int id = Integer.parseInt(request.getParameter("id"));
+
+	    Classes classes = classesDao.getClassesById(id); // Phương thức lấy lớp theo ID
+	    if (classes.getNumberOfStudents() > 0) {
+	        // Nếu có học sinh, gửi thông báo lỗi về màn hình
+	        request.setAttribute("errorMessage", "Cannot delete class because there are students!");
+	        try {
+	            request.getRequestDispatcher("ClassesController?action=/listCl").forward(request, response);
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	    } else {
+	        // Nếu không có học sinh, thực hiện xóa lớp
+	        classesDao.deleteClasses(id);
+	        
+	        // Gửi thông báo đến người dùng
+	        User userId = classes.getUsers(); // Giả sử lớp có thuộc tính `User user`
+	        Notification notification = new Notification();
+	        notification.setMessage("The class \"" + classes.getClass_name() + "\" has been deleted successfully.");
+	        notification.setUserId(userId); // Thiết lập người dùng nhận thông báo
+	        notificationDao.insertNotification(notification); // Chèn thông báo vào cơ sở dữ liệu
+	        response.sendRedirect("ClassesController?action=/listCl");
+	    }
 	}
 
 }

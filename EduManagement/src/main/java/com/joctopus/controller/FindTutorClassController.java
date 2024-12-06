@@ -15,12 +15,15 @@ import java.util.List;
 
 import com.joctopus.dao.ClassesDao;
 import com.joctopus.dao.ClassesDaoImpl;
+import com.joctopus.dao.NotificationAdminDao;
+import com.joctopus.dao.NotificationAdminDaoImpl;
 import com.joctopus.dao.NotificationDao;
 import com.joctopus.dao.NotificationDaoImpl;
 import com.joctopus.dao.UserDao;
 import com.joctopus.dao.UserDaoImpl;
 import com.joctopus.model.Classes;
 import com.joctopus.model.Notification;
+import com.joctopus.model.Notification_clients;
 import com.joctopus.model.Ucl;
 import com.joctopus.model.User;
 
@@ -30,11 +33,13 @@ public class FindTutorClassController extends HttpServlet {
 	private ClassesDao classesDao;
 	private UserDao userDao;
 	private NotificationDao notificationDao;
+	private NotificationAdminDao notificationadminDao;
 
 	public void init() {
         this.classesDao = new ClassesDaoImpl();
         this.userDao = new UserDaoImpl();
         this.notificationDao = new NotificationDaoImpl();
+        this.notificationadminDao = new NotificationAdminDaoImpl();
     }
 	
 	
@@ -60,6 +65,9 @@ public class FindTutorClassController extends HttpServlet {
 	                case "filterClasses":
 	    	            filterClasses(request, response);
 	    	            break;	
+	            	case "searchClass":
+	    				searchClasses(request, response);
+	    				break;
 	                default:
 	                    listClasses(request, response);
 	                    break;
@@ -89,6 +97,22 @@ public class FindTutorClassController extends HttpServlet {
 	            throw new ServletException(ex);
 	        }
 	    }
+	 
+	 private void searchClasses(HttpServletRequest request, HttpServletResponse response)
+				throws SQLException, IOException, ServletException {
+			String searchQuery = request.getParameter("search");
+			List<Classes> filteredClasses;
+
+			if (searchQuery == null || searchQuery.isEmpty()) {
+				filteredClasses = classesDao.selectAllClasses();
+			} else {
+				filteredClasses = classesDao.searchClassesByName(searchQuery);
+			}
+
+			request.setAttribute("listClass", filteredClasses);
+			RequestDispatcher dispatcher = request.getRequestDispatcher("FindTutorClass/index.jsp");
+			dispatcher.forward(request, response);
+		}
 	 
 	 
 	 private void filterClasses(HttpServletRequest request, HttpServletResponse response)
@@ -215,11 +239,15 @@ public class FindTutorClassController extends HttpServlet {
 	        if (!hasError) {
 	            classesDao.insertClasses(newClasses);
 
-	            // Create a notification for the admin
-	            Notification notification = new Notification();
-	            notification.setMessage("New class created: " + class_name + " (" + eduClass + ")");
-	            notification.setUserId(loggedInUser); // Assuming the notification is tied to the user who created it
-	            notificationDao.insertNotification(notification);
+	         // Nếu người dùng là Tutors hoặc Parents, tạo thông báo cho admin
+				
+				  List<User> admins = userDao.selectAdminUsers(); for (User admin : admins) {
+				  Notification_clients notification = new Notification_clients();
+				  notification.setMessage("New class created by " + loggedInUser.getType() +
+				  ": " + class_name + " (" + eduClass + ")"); notification.setUserId(admin); //
+				  //Gửi thông báo cho admin
+				 notificationadminDao.insertNotification(notification); }
+				 
 
 	            request.getSession().setAttribute("successMessage", "Class created successfully!");
 	            response.sendRedirect(request.getContextPath() + "/FindTutorClassController?action=listClassParent");
@@ -235,6 +263,7 @@ public class FindTutorClassController extends HttpServlet {
 		    int classId = Integer.parseInt(request.getParameter("id"));
 
 		    Classes classToRegister = classesDao.selectClasses(classId);
+		    Classes classes = classesDao.getClassesById(classId);
 		    if (classToRegister != null) {
 		        if (userDao.isUserRegisteredForClass(loggedInUser, classToRegister)) {
 		            session.setAttribute("errorMessage", "You are already registered for this class.");
@@ -249,7 +278,12 @@ public class FindTutorClassController extends HttpServlet {
 		            classesDao.updateClasses(classToRegister);
 		            
 		            
-		            
+		            // Send a notification to the class creator or admin
+		            User classCreator = classes.getUsers(); // Assuming each class has a creator/owner
+		            Notification notification = new Notification();
+		            notification.setMessage("User \"" + loggedInUser.getAccount() + "\" has successfully registered for the class \"" + classToRegister.getClass_name() + "\".");
+		            notification.setUserId(classCreator); // Send the notification to the class creator or admin
+		            notificationDao.insertNotification(notification); // Insert the notification into the database
 		            session.setAttribute("successMessage", "You have successfully registered for the class.");
 		        }
 		    }
@@ -272,18 +306,21 @@ public class FindTutorClassController extends HttpServlet {
 		        return;
 		    }
 
-		    if (theClass != null && theClass.getUsers().getId() == loggedInUser.getId()) {
-		        Notification notification = new Notification();
-		        notification.setMessage("Waiting for approval request for class: " + theClass.getClass_name() + " (" + theClass.getEduClass() + ")");
-		        notification.setUserId(loggedInUser);
+		    if (theClass.getUsers().getId() == loggedInUser.getId()) {
 
-		        notificationDao.insertNotification(notification);
+				Notification_clients notification = new Notification_clients();
+				notification.setMessage("Waiting for approval request for class: " + theClass.getClass_name() + " ("
+						+ theClass.getEduClass() + ")");
+				notification.setUserId(loggedInUser);
 
-		        response.getWriter().write("Notification sent");
-		    } else {
-		        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-		        response.getWriter().write("Only the creator of the class can confirm it.");
-		    }
+				notificationadminDao.insertNotification(notification);
+
+				response.setStatus(HttpServletResponse.SC_OK);
+				response.getWriter().write("Notification sent");
+			} else {
+				response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+				response.getWriter().write("Only the creator of the class can confirm it.");
+			}
 		}
 
 		
@@ -296,18 +333,20 @@ public class FindTutorClassController extends HttpServlet {
 		    Classes theClass = classesDao.getClassById(classId);
 
 		    // Check if the logged-in user is the creator of the class
-		    if (theClass != null && theClass.getUsers().getId() == loggedInUser.getId()) {
+			if (theClass != null && theClass.getUsers().getId() == loggedInUser.getId()) {
 
-		        // Create a notification for the admin
-		        Notification notification = new Notification();
-		        notification.setMessage("Class canceled: " + theClass.getClass_name() + " (" + theClass.getEduClass() + ")");
-		        notification.setUserId(loggedInUser); // Assuming the notification is tied to the user who canceled the class
-		        notificationDao.insertNotification(notification);
+				// Create a notification for the admin
+				Notification_clients notification = new Notification_clients();
+				notification.setMessage("Class canceled: " + theClass.getClass_name() + " (" + theClass.getEduClass() + ")");
+				notification.setUserId(loggedInUser); // Assuming the notification is tied to the user who canceled the
+														// class
+				notificationadminDao.insertNotification(notification);
 
-		        request.getSession().setAttribute("successMessage", "Class canceled successfully. Notification sent to admin.");
-		    } else {
-		        request.getSession().setAttribute("errorMessage", "You can only cancel classes you created.");
-		    }
+				request.getSession().setAttribute("successMessage",
+						"Class canceled successfully. Notification sent to admin.");
+			} else {
+				request.getSession().setAttribute("errorMessage", "You can only cancel classes you created.");
+			}
 
 		    response.sendRedirect(request.getContextPath() + "/FindTutorClassController?action=listClassParent");
 		}

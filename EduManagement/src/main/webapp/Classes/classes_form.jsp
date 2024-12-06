@@ -130,7 +130,7 @@
 							<fieldset class="form-group">
 								<label>Number Studets</label> <input type="text"
 									value="<c:out value='${Classes.numberOfStudents}' />"
-									class="form-control" name="numberOfStudents"> <span
+									class="form-control" name="numberOfStudents" readonly> <span
 									class="text-danger">${requestScope.numberOfStudents_error}</span>
 							</fieldset>
 						</c:if>

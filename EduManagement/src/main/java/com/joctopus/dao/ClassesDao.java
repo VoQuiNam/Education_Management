@@ -18,8 +18,12 @@ public interface ClassesDao {
 	void updateClasses(Classes classes) throws SQLException;
 
 	boolean isClassNameExists(String account) throws SQLException;
-	
+
 	Classes getClassById(int id);
+
+	public List<Classes> selectClassesByStatus(String status);
 	
-	 public List<Classes> selectClassesByStatus(String status);
+	public List<Classes> searchClassesByName(String className);
+	
+	public Classes getClassesById(int id) throws SQLException;
 }

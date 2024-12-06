@@ -3,7 +3,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -90,9 +89,15 @@
 		<a type="button" class="create-btn"
 			href="<%=request.getContextPath()%>/FindTutorClassController?action=/newClass" style="margin-top: 73px;">Create
 			Class</a>
+			
+		<!-- Initialize a flag to check for approved classes -->
+		<c:set var="hasApprovedClasses" value="false" />
+		
+		
 		<ul class="tutor-classes-list">
 			<c:forEach var="classes" items="${listClass}">
 				<c:if test="${classes.requeststatus ne 'Unapproved'}">
+				<c:set var="hasApprovedClasses" value="true" />
 					<li class="tutor-class-item">
 						<h2>Class Name: ${classes.class_name}</h2>
 						<p>
@@ -150,6 +155,11 @@
 				</c:if>
 			</c:forEach>
 		</ul>
+		
+		<!-- Display "No data found" if no approved classes exist -->
+		<c:if test="${empty listClass || !hasApprovedClasses}">
+			<p class="no-data-message">No data found</p>
+		</c:if>
 	</div>
 
 	<script>

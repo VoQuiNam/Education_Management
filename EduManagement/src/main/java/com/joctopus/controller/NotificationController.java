@@ -16,6 +16,7 @@ import com.joctopus.dao.NotificationDao;
 import com.joctopus.dao.NotificationDaoImpl;
 import com.joctopus.model.Classes;
 import com.joctopus.model.Notification;
+import com.joctopus.model.Notification_clients;
 
 @WebServlet("/NotificationController")
 public class NotificationController extends HttpServlet {
@@ -50,6 +51,7 @@ public class NotificationController extends HttpServlet {
 	        if ("remove".equals(action)) {
 	            try {
 	                int notificationId = Integer.parseInt(request.getParameter("id"));
+	                
 	                notificationDao.removeNotification(notificationId);
 	                response.setContentType("application/json");
 	                response.getWriter().write("{\"status\":\"success\"}");

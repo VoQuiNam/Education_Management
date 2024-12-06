@@ -25,6 +25,15 @@
 <script src="<c:url value='/js/delete_waring.js'/>"></script>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
+	<c:if test="${not empty errorMessage}">
+		<script>
+			Swal.fire({
+				icon : 'error',
+				title : 'Error!',
+				text : '${errorMessage}'
+			});
+		</script>
+	</c:if>
 	<div class="wrapper">
 		<c:import url="/WEB-INF/fragments/menus.jsp" />
 		<div class="content-wrapper" id="main-content">
@@ -40,38 +49,45 @@
 										class="btn btn-primary">Add</a>
 								</div>
 								<div class="card-body">
-									<table id="example1" class="table table-bordered table-striped">
-										<thead>
-											<tr>
-												<th>Class Name</th>
-												<th>Class</th>
-												<th>Study Time</th>
-												<th>Subject</th>
-												<th>Number Students</th>
-											</tr>
-										</thead>
-										<tbody>
-											<c:forEach var="classes" items="${listClass}">
-												<tr>
-													<td><c:out value="${classes.class_name}" /></td>
-													<td><c:out value="${classes.eduClass}" /></td>
-													<td><c:out value="${classes.study_time}" /></td>
-													<td><c:out value="${classes.subject}" /></td>
-													<td><c:out value="${classes.numberOfStudents}" /></td>
-													<%--
-													<td>
-														<c:out value="${classes.users.firstName} ${classes.users.lastName}" />
-													</td> --%>
-
-													<td class="action-buttons"><a
-														href="<%=request.getContextPath()%>/ClassesController?action=/editCl&id=${classes.id}"
-														class="btn btn-warning">Edit</a> <a
-														href="<%=request.getContextPath()%>/ClassesController?action=/deleteCl&id=${classes.id}"
-														class="btn btn-danger delete-button">Delete</a></td>
-												</tr>
-											</c:forEach>
-										</tbody>
-									</table>
+									<c:choose>
+										
+										<c:when test="${empty listClass}">
+											<div class="alert alert-warning" role="alert">No
+												classes available.</div>
+										</c:when>
+										
+										<c:otherwise>
+											<table id="example1"
+												class="table table-bordered table-striped">
+												<thead>
+													<tr>
+														<th>Class Name</th>
+														<th>Class</th>
+														<th>Study Time</th>
+														<th>Subject</th>
+														<th>Number Students</th>
+														<th>Actions</th>
+													</tr>
+												</thead>
+												<tbody>
+													<c:forEach var="classes" items="${listClass}">
+														<tr>
+															<td><c:out value="${classes.class_name}" /></td>
+															<td><c:out value="${classes.eduClass}" /></td>
+															<td><c:out value="${classes.study_time}" /></td>
+															<td><c:out value="${classes.subject}" /></td>
+															<td><c:out value="${classes.numberOfStudents}" /></td>
+															<td class="action-buttons"><a
+																href="<%=request.getContextPath()%>/ClassesController?action=/editCl&id=${classes.id}"
+																class="btn btn-warning">Edit</a> <a
+																href="<%=request.getContextPath()%>/ClassesController?action=/deleteCl&id=${classes.id}"
+																class="btn btn-danger delete-button">Delete</a></td>
+														</tr>
+													</c:forEach>
+												</tbody>
+											</table>
+										</c:otherwise>
+									</c:choose>
 								</div>
 							</div>
 						</div>

@@ -23,6 +23,7 @@ import com.joctopus.dao.UserDao;
 import com.joctopus.dao.UserDaoImpl;
 import com.joctopus.model.Classes;
 import com.joctopus.model.Notification;
+import com.joctopus.model.Notification_clients;
 import com.joctopus.model.Ucl;
 import com.joctopus.model.User;
 import com.joctopus.util.HibernateUtil;
@@ -62,10 +63,12 @@ public class AdminssionClassController extends HttpServlet {
 			case "registerClass": // Assuming this is the action for registering a class
 				registerClass(request, response);
 				break;
-			 case "filterClasses":
-	            filterClasses(request, response);
-	            break;	
-
+			case "filterClasses":
+				filterClasses(request, response);
+				break;
+			case "searchClass":
+				searchClasses(request, response);
+				break;
 			default:
 				listClasses(request, response);
 				break;
@@ -75,39 +78,57 @@ public class AdminssionClassController extends HttpServlet {
 		}
 	}
 
-	 protected void doPost(HttpServletRequest request, HttpServletResponse response)
-	            throws ServletException, IOException {
-	        String action = request.getParameter("action");
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		String action = request.getParameter("action");
 
-	        try {
-	            switch (action) {
-	                case "confirmTeach":
-	                    confirmTeach(request, response);
-	                    break;
-	                case "cancelClass":
-	                    cancelClass(request, response);
-	                    break;
-	                default:
-	                    doGet(request, response);
-	                    break;
-	            }
-	        } catch (SQLException ex) {
-	            throw new ServletException(ex);
-	        }
+		try {
+			switch (action) {
+			case "confirmTeach":
+				confirmTeach(request, response);
+				break;
+			case "cancelClass":
+				cancelClass(request, response);
+				break;
+			default:
+				doGet(request, response);
+				break;
+			}
+		} catch (SQLException ex) {
+			throw new ServletException(ex);
+		}
+	}
+
+	private void searchClasses(HttpServletRequest request, HttpServletResponse response)
+	        throws SQLException, IOException, ServletException {
+	    String searchQuery = request.getParameter("search");
+	    List<Classes> filteredClasses;
+
+	    if (searchQuery == null || searchQuery.isEmpty()) {
+	        filteredClasses = classesDao.selectAllClasses();
+	    } else {
+	        filteredClasses = classesDao.searchClassesByName(searchQuery);
 	    }
-	 
-	 private void filterClasses(HttpServletRequest request, HttpServletResponse response)
-		        throws SQLException, IOException, ServletException {
-		 	String status = request.getParameter("status");
-		    List<Classes> filteredClasses;
-		    if (status == null || status.isEmpty() || status.equalsIgnoreCase("All")) {
-		        filteredClasses = classesDao.selectAllClasses();
-		    } else {
-		        filteredClasses = classesDao.selectClassesByStatus(status);
-		    }
-		    request.setAttribute("listClass", filteredClasses);
-		    RequestDispatcher dispatcher = request.getRequestDispatcher("AdminssionClass/index.jsp");
-		    dispatcher.forward(request, response);
+
+	    request.setAttribute("listClass", filteredClasses);
+	    request.setAttribute("searchQuery", searchQuery); // Gửi giá trị tìm kiếm về JSP
+	    RequestDispatcher dispatcher = request.getRequestDispatcher("AdminssionClass/index.jsp");
+	    dispatcher.forward(request, response);
+	}
+
+
+	private void filterClasses(HttpServletRequest request, HttpServletResponse response)
+			throws SQLException, IOException, ServletException {
+		String status = request.getParameter("status");
+		List<Classes> filteredClasses;
+		if (status == null || status.isEmpty() || status.equalsIgnoreCase("All")) {
+			filteredClasses = classesDao.selectAllClasses();
+		} else {
+			filteredClasses = classesDao.selectClassesByStatus(status);
+		}
+		request.setAttribute("listClass", filteredClasses);
+		RequestDispatcher dispatcher = request.getRequestDispatcher("AdminssionClass/index.jsp");
+		dispatcher.forward(request, response);
 	}
 
 	private void listClasses(HttpServletRequest request, HttpServletResponse response)
@@ -115,8 +136,7 @@ public class AdminssionClassController extends HttpServlet {
 		List<Classes> listClass = classesDao.selectAllClasses();
 
 		request.setAttribute("listClass", listClass);
-		
-		  
+
 		RequestDispatcher dispatcher = request.getRequestDispatcher("AdminssionClass/index.jsp");
 		dispatcher.forward(request, response);
 	}
@@ -148,11 +168,9 @@ public class AdminssionClassController extends HttpServlet {
 		if (class_name.isEmpty()) {
 			request.setAttribute("class_name_error", "Class name cannot be blank.");
 			hasError = true;
-		} else {
-			if (class_name.length() < 2 || class_name.length() > 50) {
-				request.setAttribute("class_name_error", "The class name must be between 2 and 50 characters.");
-				hasError = true;
-			}
+		} else if (class_name.length() < 2 || class_name.length() > 50) {
+			request.setAttribute("class_name_error", "The class name must be between 2 and 50 characters.");
+			hasError = true;
 		}
 
 		if (classesDao.isClassNameExists(class_name)) {
@@ -221,21 +239,17 @@ public class AdminssionClassController extends HttpServlet {
 		if (!hasError) {
 			classesDao.insertClasses(newClasses);
 
-			// Create a notification for the admin
-			//Notification notification = new Notification();
-			//notification.setMessage("New class created: " + class_name + " (" + eduClass + ")");
-			//notification.setUserId(loggedInUser); // Assuming the notification is tied to the user who created it
-			//notificationDao.insertNotification(notification);
-			
-			List<User> admins = userDao.selectUsersByType("Admin");
-	        for (User admin : admins) {
-	            Notification notification = new Notification();
-	            notification.setMessage("New class created: " + class_name + " (" + eduClass + ")");
-	            notification.setUserId(admin); // Set admin user as the recipient
-	            notificationDao.insertNotification(notification);
-	        }
-	        
-	   
+			// Nếu người dùng là Tutors hoặc Parents, tạo thông báo cho admin
+
+			List<User> admins = userDao.selectAdminUsers();
+			for (User admin : admins) {
+				Notification_clients notification = new Notification_clients();
+				notification.setMessage(
+						"New class created by " + loggedInUser.getType() + ": " + class_name + " (" + eduClass + ")");
+				notification.setUserId(admin); //
+				// Gửi thông báo cho admin
+				notificationadminDao.insertNotification(notification);
+			}
 
 			request.getSession().setAttribute("successMessage", "Class created successfully!");
 			response.sendRedirect(request.getContextPath() + "/AdminssionClassController?action=listClass");
@@ -243,39 +257,41 @@ public class AdminssionClassController extends HttpServlet {
 			request.getRequestDispatcher("AdminssionClass/CreateClass.jsp").forward(request, response);
 		}
 	}
-	
-		
-	
 
-		
 	private void registerClass(HttpServletRequest request, HttpServletResponse response)
-	        throws SQLException, IOException, ServletException {
-	    HttpSession session = request.getSession();
-	    User loggedInUser = (User) session.getAttribute("loggedInUser");
-	    int classId = Integer.parseInt(request.getParameter("id"));
+			throws SQLException, IOException, ServletException {
+		HttpSession session = request.getSession();
+		User loggedInUser = (User) session.getAttribute("loggedInUser");
+		int classId = Integer.parseInt(request.getParameter("id"));
 
-	    Classes classToRegister = classesDao.selectClasses(classId);
-	    if (classToRegister != null) {
-	        if (userDao.isUserRegisteredForClass(loggedInUser, classToRegister)) {
-	            session.setAttribute("errorMessage", "You are already registered for this class.");
-	        }else if ("Tutors".equals(loggedInUser.getType()) && classToRegister.getNumberOfStudents() == 1) {
-	            // Check if the logged-in user is a tutor and there is already a tutor registered for the class
-	            session.setAttribute("errorMessage", "There is already a teacher registered for this class.");
-	        }
-	         else {
-	            Ucl ucl = new Ucl(loggedInUser, classToRegister);
-	            userDao.insertUcl(ucl);
-	            
-	            classToRegister.setNumberOfStudents(classToRegister.getNumberOfStudents() + 1);
-	            classesDao.updateClasses(classToRegister);
-	            
-	            
-	            
-	            session.setAttribute("successMessage", "You have successfully registered for the class.");
-	        }
-	    }
+		Classes classToRegister = classesDao.selectClasses(classId);
+		Classes classes = classesDao.getClassesById(classId); 
+		if (classToRegister != null) {
+			if (userDao.isUserRegisteredForClass(loggedInUser, classToRegister)) {
+				session.setAttribute("errorMessage", "You are already registered for this class.");
+			} else if ("Tutors".equals(loggedInUser.getType()) && classToRegister.getNumberOfStudents() == 1) {
+				// Check if the logged-in user is a tutor and there is already a tutor
+				// registered for the class
+				session.setAttribute("errorMessage", "There is already a teacher registered for this class.");
+			} else {
+				Ucl ucl = new Ucl(loggedInUser, classToRegister);
+				userDao.insertUcl(ucl);
 
-	    response.sendRedirect(request.getContextPath() + "/AdminssionClassController?action=listClass");
+				classToRegister.setNumberOfStudents(classToRegister.getNumberOfStudents() + 1);
+				classesDao.updateClasses(classToRegister);
+
+				 // Send a notification to the class creator or admin
+	            User classCreator = classes.getUsers(); // Assuming each class has a creator/owner
+	            Notification notification = new Notification();
+	            notification.setMessage("User \"" + loggedInUser.getAccount() + "\" has successfully registered for the class \"" + classToRegister.getClass_name() + "\".");
+	            notification.setUserId(classCreator); // Send the notification to the class creator or admin
+	            notificationDao.insertNotification(notification); // Insert the notification into the database
+
+				session.setAttribute("successMessage", "You have successfully registered for the class.");
+			}
+		}
+
+		response.sendRedirect(request.getContextPath() + "/AdminssionClassController?action=listClass");
 	}
 
 	private void confirmTeach(HttpServletRequest request, HttpServletResponse response)
@@ -285,52 +301,55 @@ public class AdminssionClassController extends HttpServlet {
 
 		HttpSession httpSession = request.getSession();
 		User loggedInUser = (User) httpSession.getAttribute("loggedInUser");
-		
-		   if (theClass.getNumberOfStudents() == 0) {
-		        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-		        response.getWriter().write("Requires a registered instructor.");
-		        return;
-		    }
-		
+
+		if (theClass.getNumberOfStudents() == 0) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().write("Requires a registered instructor.");
+			return;
+		}
+
 		if (theClass.getUsers().getId() == loggedInUser.getId()) {
-			
-			Notification notification = new Notification();
+
+			Notification_clients notification = new Notification_clients();
 			notification.setMessage("Waiting for approval request for class: " + theClass.getClass_name() + " ("
-						+ theClass.getEduClass() + ")");
+					+ theClass.getEduClass() + ")");
 			notification.setUserId(loggedInUser);
-		
-			notificationDao.insertNotification(notification);
-	
+
+			notificationadminDao.insertNotification(notification);
+
 			response.setStatus(HttpServletResponse.SC_OK);
 			response.getWriter().write("Notification sent");
 		} else {
-			 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-			 response.getWriter().write("Only the creator of the class can confirm it.");
-	    }
+			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			response.getWriter().write("Only the creator of the class can confirm it.");
+		}
 	}
-	
+
 	private void cancelClass(HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, IOException {
-	    int classId = Integer.parseInt(request.getParameter("id"));
-	    HttpSession httpSession = request.getSession();
-	    User loggedInUser = (User) httpSession.getAttribute("loggedInUser");
+		int classId = Integer.parseInt(request.getParameter("id"));
+		HttpSession httpSession = request.getSession();
+		User loggedInUser = (User) httpSession.getAttribute("loggedInUser");
 
-	    Classes theClass = classesDao.getClassById(classId);
+		Classes theClass = classesDao.getClassById(classId);
 
-	    // Check if the logged-in user is the creator of the class
-	    if (theClass != null && theClass.getUsers().getId() == loggedInUser.getId()) {
+		// Check if the logged-in user is the creator of the class
+		if (theClass != null && theClass.getUsers().getId() == loggedInUser.getId()) {
 
-	        // Create a notification for the admin
-	        Notification notification = new Notification();
-	        notification.setMessage("Class canceled: " + theClass.getClass_name() + " (" + theClass.getEduClass() + ")");
-	        notification.setUserId(loggedInUser); // Assuming the notification is tied to the user who canceled the class
-	        notificationDao.insertNotification(notification);
+			// Create a notification for the admin
+			Notification_clients notification = new Notification_clients();
+			notification
+					.setMessage("Class canceled: " + theClass.getClass_name() + " (" + theClass.getEduClass() + ")");
+			notification.setUserId(loggedInUser); // Assuming the notification is tied to the user who canceled the
+													// class
+			notificationadminDao.insertNotification(notification);
 
-	        request.getSession().setAttribute("successMessage", "Class canceled successfully. Notification sent to admin.");
-	    } else {
-	        request.getSession().setAttribute("errorMessage", "You can only cancel classes you created.");
-	    }
+			request.getSession().setAttribute("successMessage",
+					"Class canceled successfully. Notification sent to admin.");
+		} else {
+			request.getSession().setAttribute("errorMessage", "You can only cancel classes you created.");
+		}
 
-	    response.sendRedirect(request.getContextPath() + "/AdminssionClassController?action=listClass");
+		response.sendRedirect(request.getContextPath() + "/AdminssionClassController?action=listClass");
 	}
 }

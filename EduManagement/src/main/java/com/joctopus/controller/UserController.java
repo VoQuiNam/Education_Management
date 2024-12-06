@@ -113,6 +113,11 @@ public class UserController extends HttpServlet {
 		LocalDate DOB = null;
 		if (dobParam != null && !dobParam.isEmpty()) {
 			DOB = LocalDate.parse(dobParam);
+			
+			 if (DOB.getYear() < 1950) {
+		            request.setAttribute("dob_error", "Date of birth cannot be earlier than 1950.");
+		            hasError = true;
+		        }
 		} else {
 			DOB = LocalDate.now(); // hoặc bất kỳ ngày mặc định nào khác phù hợp với bạn
 		}
@@ -209,6 +214,18 @@ public class UserController extends HttpServlet {
 			// Đặt biến hasError thành true để biểu thị rằng có lỗi được phát hiện
 			hasError = true;
 		}
+		
+		 // Lưu các giá trị đã nhập vào request
+	    request.setAttribute("id", id);
+	    request.setAttribute("first_name", first_name);
+	    request.setAttribute("last_name", last_name);
+	    request.setAttribute("dob", dobParam);
+	    request.setAttribute("gender", gender);
+	    request.setAttribute("address", address);
+	    request.setAttribute("phone_number", phone_number);
+	    request.setAttribute("account", account);
+	    request.setAttribute("password", password);
+	    request.setAttribute("type", type);
 
 		// Nếu có lỗi, hiển thị lại form với thông báo lỗi
 		if (hasError) {
@@ -395,285 +412,35 @@ public class UserController extends HttpServlet {
 		response.sendRedirect("UserController?action=/list");
 	}
 
-//	private void insertUser(HttpServletRequest request, HttpServletResponse response)
-//			throws SQLException, IOException, ServletException {
-//
-//		String first_name = request.getParameter("first_name");
-//		String last_name = request.getParameter("last_name");
-////		LocalDate DOB = LocalDate.parse(request.getParameter("DOB"));
-//		String dobParam = request.getParameter("DOB");
-//		LocalDate DOB;
-//
-//		// Kiểm tra nếu chuỗi DOB không rỗng và có định dạng hợp lệ
-//		if (!dobParam.isEmpty() && dobParam.matches("\\d{4}-\\d{2}-\\d{2}")) {
-//			// Chuyển đổi chuỗi DOB thành LocalDate
-//			DOB = LocalDate.parse(dobParam);
-//		} else {
-//			// Xử lý lỗi khi chuỗi DOB không hợp lệ
-//			request.setAttribute("dob_error", "Please enter a valid date of birth.");
-//			RequestDispatcher dispatcher = request.getRequestDispatcher("User/user_form.jsp");
-//			dispatcher.forward(request, response);
-//			return;
-//		}
-//
-//		// Kiểm tra điều kiện nếu năm không hợp lệ
-//		if (DOB.getYear() < 1900 || DOB.getYear() > LocalDate.now().getYear()) {
-//			// Lưu thông điệp lỗi vào request attribute cho DOB
-//			request.setAttribute("dob_error", "Please enter a valid year.");
-//			// Forward lại request đến trang form để hiển thị lại form với thông báo lỗi
-//			RequestDispatcher dispatcher = request.getRequestDispatcher("User/user_form.jsp");
-//			dispatcher.forward(request, response);
-//			return; // Dừng phương thức
-//		}
-//
-//		String gender = request.getParameter("gender");
-//		String address = request.getParameter("address");
-//		String phone_number = request.getParameter("phone_number");
-//		String account = request.getParameter("account");
-//		String password = request.getParameter("password");
-//		String type = request.getParameter("type");
-//
-//		// Kiểm tra điều kiện nếu first_name ít hơn 3 ký tự
-//		if (first_name.isEmpty() || last_name.isEmpty()) {
-//			// Kiểm tra first_name
-//			if (first_name.isEmpty()) {
-//				// Lưu thông điệp lỗi vào request attribute cho first_name
-//				request.setAttribute("first_name_error", "The first name cannot be blank.");
-//			}
-//			// Kiểm tra last_name
-//			if (last_name.isEmpty()) {
-//				// Lưu thông điệp lỗi vào request attribute cho last_name
-//				request.setAttribute("last_name_error", "The last name cannot be blank.");
-//			}
-//			// Forward lại request đến trang form để hiển thị lại form với thông báo lỗi
-//			RequestDispatcher dispatcher = request.getRequestDispatcher("User/user_form.jsp");
-//			dispatcher.forward(request, response);
-//			return; // Dừng phương thức
-//		}
-//
-//		// Kiểm tra điều kiện nếu first_name ít hơn 3 ký tự
-//		if (first_name.length() < 3 || last_name.length() < 3) {
-//			if (first_name.length() < 3) {
-//				// Lưu thông điệp lỗi vào request attribute
-//				request.setAttribute("first_name_error", "The first name must contain at least 3 characters.");
-//			}
-//
-//			// Kiểm tra điều kiện nếu first_name ít hơn 3 ký tự
-//			if (last_name.length() < 3) {
-//				// Lưu thông điệp lỗi vào request attribute
-//				request.setAttribute("last_name_error", "The last name must contain at least 3 characters.");
-//			}
-//
-//			// Forward lại request đến trang form để hiển thị lại form với thông báo lỗi
-//			RequestDispatcher dispatcher = request.getRequestDispatcher("User/user_form.jsp");
-//			dispatcher.forward(request, response);
-//			return; // Dừng phương thức
-//		}
-//
-//		// Kiểm tra điều kiện nếu first_name nhiều hơn 20 kí tự
-//		if (first_name.length() > 20 || last_name.length() > 20) {
-//			if (first_name.length() >= 20) {
-//				// Lưu thông điệp lỗi vào request attribute
-//				request.setAttribute("first_name_error", "The first name cannot exceed 20 characters.");
-//			}
-//
-//			// Kiểm tra điều kiện nếu first_name ít hơn 3 ký tự
-//			if (last_name.length() >= 20) {
-//				// Lưu thông điệp lỗi vào request attribute
-//				request.setAttribute("last_name_error", "The first name cannot exceed 20 characters.");
-//			}
-//
-//			// Forward lại request đến trang form để hiển thị lại form với thông báo lỗi
-//			RequestDispatcher dispatcher = request.getRequestDispatcher("User/user_form.jsp");
-//			dispatcher.forward(request, response);
-//			return; // Dừng phương thức
-//		}
-//
-//		// Kiểm tra điều kiện nếu first_name chứa số hoặc ký tự đặc biệt(chứa ít nhất
-//		// một ký tự không phải là chữ cái từ A-Z hoặc a-z)
-//		if (!first_name.matches("[a-zA-Z]+") || !last_name.matches("[a-zA-Z]+")) {
-//			if (!first_name.matches("[a-zA-Z]+")) {
-//				// Lưu thông điệp lỗi vào request attribute
-//				request.setAttribute("first_name_error",
-//						"The first name cannot contain numbers or special characters.");
-//			}
-//
-//			// Kiểm tra điều kiện nếu last_name chứa số hoặc ký tự đặc biệt
-//			if (!last_name.matches("[a-zA-Z]+")) {
-//				// Lưu thông điệp lỗi vào request attribute
-//				request.setAttribute("last_name_error", "The last name cannot contain numbers or special characters.");
-//			}
-//
-//			// Forward lại request đến trang form để hiển thị lại form với thông báo lỗi
-//			RequestDispatcher dispatcher = request.getRequestDispatcher("User/user_form.jsp");
-//			dispatcher.forward(request, response);
-//			return; // Dừng phương thức
-//		}
-//
-//		// Kiểm tra nếu giá trị giới tính không được chọn
-//		if (gender == null || gender.isEmpty()) {
-//			// Lưu thông điệp lỗi vào request attribute cho giới tính
-//			request.setAttribute("gender_error", "Please select a gender.");
-//			// Forward lại request đến trang form để hiển thị lại form với thông báo lỗi
-//			RequestDispatcher dispatcher = request.getRequestDispatcher("User/user_form.jsp");
-//			dispatcher.forward(request, response);
-//			return; // Dừng phương thức
-//		}
-//
-//		if (address.isEmpty()) {
-//			// Lưu thông điệp lỗi vào request attribute cho last_name
-//			request.setAttribute("address_error", "The address cannot be blank.");
-//			// Forward lại request đến trang form để hiển thị lại form với thông báo lỗi
-//			RequestDispatcher dispatcher = request.getRequestDispatcher("User/user_form.jsp");
-//			dispatcher.forward(request, response);
-//			return; // Dừng phương thức
-//		}
-//
-//		if (address.length() < 5) {
-//			// Lưu thông điệp lỗi vào request attribute cho last_name
-//			request.setAttribute("address_error", "The address least 5 characters.");
-//			// Forward lại request đến trang form để hiển thị lại form với thông báo lỗi
-//			RequestDispatcher dispatcher = request.getRequestDispatcher("User/user_form.jsp");
-//			dispatcher.forward(request, response);
-//			return; // Dừng phương thức
-//		}
-//
-//		if (address.length() > 50) {
-//			// Lưu thông điệp lỗi vào request attribute cho last_name
-//			request.setAttribute("address_error", "The address cannot exceed 50 characters.");
-//			// Forward lại request đến trang form để hiển thị lại form với thông báo lỗi
-//			RequestDispatcher dispatcher = request.getRequestDispatcher("User/user_form.jsp");
-//			dispatcher.forward(request, response);
-//			return; // Dừng phương thức
-//		}
-//
-//		// Kiểm tra điều kiện nếu last_name chứa số hoặc ký tự đặc biệt
-//		if (!address.matches("[a-zA-Z]+")) {
-//			// Lưu thông điệp lỗi vào request attribute
-//			request.setAttribute("address_error", "The address cannot contain numbers or special characters.");
-//			// Forward lại request đến trang form để hiển thị lại form với thông báo lỗi
-//			RequestDispatcher dispatcher = request.getRequestDispatcher("User/user_form.jsp");
-//			dispatcher.forward(request, response);
-//			return; // Dừng phương thức
-//		}
-//
-//		if (phone_number.isEmpty()) {
-//			// Lưu thông điệp lỗi vào request attribute cho số điện thoại
-//			request.setAttribute("phone_number_error", "Phone number cannot be blank.");
-//
-//			// Forward lại request đến trang form để hiển thị lại form với thông báo lỗi
-//			RequestDispatcher dispatcher = request.getRequestDispatcher("User/user_form.jsp");
-//			dispatcher.forward(request, response);
-//			return; // Dừng phương thức
-//		}
-//
-//		if (phone_number.length() > 11 || phone_number.length() < 10) {
-//			// Lưu thông điệp lỗi vào request attribute cho số điện thoại
-//			request.setAttribute("phone_number_error", "Phone number invalid.");
-//
-//			// Forward lại request đến trang form để hiển thị lại form với thông báo lỗi
-//			RequestDispatcher dispatcher = request.getRequestDispatcher("User/user_form.jsp");
-//			dispatcher.forward(request, response);
-//			return; // Dừng phương thức
-//		}
-//
-//		// Kiểm tra điều kiện nếu số điện thoại không chỉ chứa số
-//		if (!phone_number.matches("\\d+")) {
-//			// Lưu thông điệp lỗi vào request attribute cho số điện thoại
-//			request.setAttribute("phone_number_error", "Phone number must contain only digits.");
-//
-//			// Forward lại request đến trang form để hiển thị lại form với thông báo lỗi
-//			RequestDispatcher dispatcher = request.getRequestDispatcher("User/user_form.jsp");
-//			dispatcher.forward(request, response);
-//			return; // Dừng phương thức
-//		}
-//
-//		if (account.isEmpty()) {
-//			// Lưu thông điệp lỗi vào request attribute cho số điện thoại
-//			request.setAttribute("account_error", "Account cannot be blank.");
-//
-//			// Forward lại request đến trang form để hiển thị lại form với thông báo lỗi
-//			RequestDispatcher dispatcher = request.getRequestDispatcher("User/user_form.jsp");
-//			dispatcher.forward(request, response);
-//			return; // Dừng phương thức
-//		}
-//
-//		if (account.length() < 10) {
-//			// Lưu thông điệp lỗi vào request attribute cho last_name
-//			request.setAttribute("account_error", "The account least 10 characters.");
-//			// Forward lại request đến trang form để hiển thị lại form với thông báo lỗi
-//			RequestDispatcher dispatcher = request.getRequestDispatcher("User/user_form.jsp");
-//			dispatcher.forward(request, response);
-//			return; // Dừng phương thức
-//		}
-//
-//		if (account.length() >= 30) {
-//			// Lưu thông điệp lỗi vào request attribute cho last_name
-//			request.setAttribute("account_error", "The address cannot exceed 30 characters.");
-//			// Forward lại request đến trang form để hiển thị lại form với thông báo lỗi
-//			RequestDispatcher dispatcher = request.getRequestDispatcher("User/user_form.jsp");
-//			dispatcher.forward(request, response);
-//			return; // Dừng phương thức
-//		}
-//
-//		// Kiểm tra định dạng của địa chỉ email
-//		if (!EmailValidator.getInstance().isValid(account)) {
-//			// Lưu thông điệp lỗi vào request attribute cho tài khoản
-//			request.setAttribute("account_error", "Invalid email format.");
-//
-//			// Forward lại request đến trang form để hiển thị lại form với thông báo lỗi
-//			RequestDispatcher dispatcher = request.getRequestDispatcher("User/user_form.jsp");
-//			dispatcher.forward(request, response);
-//			return; // Dừng phương thức
-//		}
-//
-//		if (account.isEmpty()) {
-//			// Lưu thông điệp lỗi vào request attribute cho số điện thoại
-//			request.setAttribute("account_error", "Account cannot be blank.");
-//
-//			// Forward lại request đến trang form để hiển thị lại form với thông báo lỗi
-//			RequestDispatcher dispatcher = request.getRequestDispatcher("User/user_form.jsp");
-//			dispatcher.forward(request, response);
-//			return; // Dừng phương thức
-//		}
-//
-//		if (password.length() < 10) {
-//			// Lưu thông điệp lỗi vào request attribute cho last_name
-//			request.setAttribute("password_error", "The account least 10 characters.");
-//			// Forward lại request đến trang form để hiển thị lại form với thông báo lỗi
-//			RequestDispatcher dispatcher = request.getRequestDispatcher("User/user_form.jsp");
-//			dispatcher.forward(request, response);
-//			return; // Dừng phương thức
-//		}
-//
-//		if (password.length() > 10) {
-//			// Lưu thông điệp lỗi vào request attribute cho last_name
-//			request.setAttribute("password_error", "The address cannot exceed 10 characters.");
-//			// Forward lại request đến trang form để hiển thị lại form với thông báo lỗi
-//			RequestDispatcher dispatcher = request.getRequestDispatcher("User/user_form.jsp");
-//			dispatcher.forward(request, response);
-//			return; // Dừng phương thức
-//		}
-//
-//		// Kiểm tra nếu giá trị giới tính không được chọn
-//		if (type == null || type.isEmpty()) {
-//			// Lưu thông điệp lỗi vào request attribute cho giới tính
-//			request.setAttribute("type_error", "Please select a type.");
-//			// Forward lại request đến trang form để hiển thị lại form với thông báo lỗi
-//			RequestDispatcher dispatcher = request.getRequestDispatcher("User/user_form.jsp");
-//			dispatcher.forward(request, response);
-//			return; // Dừng phương thức
-//		}
-//
-//		User newUser = new User(first_name, last_name, DOB, gender, address, phone_number, account, password, type);
-//		usersDAO.insertUser(newUser);
-//		response.sendRedirect("list");
-//	}
 
 	private void deleteUser(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
-		int id = Integer.parseInt(request.getParameter("id")); // Sử dụng long ở đây
-		usersDAO.deleteUser(id);
-		response.sendRedirect("UserController?action=/list");
+	    int id = Integer.parseInt(request.getParameter("id"));
+
+	    // Kiểm tra nếu người dùng đang tạo lớp
+	    boolean hasClasses = usersDAO.checkIfUserHasClasses(id);
+
+	    // Kiểm tra nếu người dùng đang học trong lớp
+	    boolean isEnrolledInClass = usersDAO.checkIfUserIsEnrolledInClass(id);
+
+	    if (hasClasses) {
+	        // Nếu người dùng đang tạo lớp
+	        request.getSession().setAttribute("errorMessage", "User has created classes, cannot be deleted.");
+	    } else if (isEnrolledInClass) {
+	        // Nếu người dùng đang học trong lớp
+	        request.getSession().setAttribute("errorMessage", "User is enrolled in a class, cannot be deleted.");
+	    }
+
+	    if (hasClasses || isEnrolledInClass) {
+	        // Redirect to the list page with the error message
+	        response.sendRedirect("UserController?action=/list");
+	    } else {
+	        // Nếu không, tiến hành xóa người dùng
+	        usersDAO.deleteUser(id);
+	        response.sendRedirect("UserController?action=/list");
+	    }
 	}
+
+
+
 
 }

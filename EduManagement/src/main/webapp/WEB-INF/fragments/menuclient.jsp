@@ -1,3 +1,4 @@
+<%@page import="java.util.ArrayList"%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="ISO-8859-1"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -5,19 +6,26 @@
 <%@ page import="com.joctopus.model.Notification"%>
 <%@ page import="com.joctopus.dao.NotificationDao"%>
 <%@ page import="com.joctopus.dao.NotificationDaoImpl"%>
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
 <%
 String type = (String) session.getAttribute("type");
 NotificationDao notificationDao = new NotificationDaoImpl();
-List<Notification> notifications = null;
-
-
-	notifications = notificationDao.selectAllNotifications();
-    request.setAttribute("notifications", notifications);
-
+Integer userIdStr = (Integer) session.getAttribute("user_id");
+if (userIdStr != null) {
+	List<Notification> notifications = notificationDao.selectNotificationsByUserId(userIdStr);
+	request.setAttribute("notifications", notifications);
+} else {
+	System.out.println("User ID is null");
+	request.setAttribute("notifications", new ArrayList<>());
+}
 %>
-
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<style>
+</style>
 <header class="header" data-header>
 	<div class="container">
 
@@ -73,10 +81,8 @@ List<Notification> notifications = null;
 
 		<div class="header-actions" style="position: relative; left: -56px;">
 
-			<button class="header-action-btn" aria-label="toggle search"
-				title="Search">
-				<ion-icon name="search-outline" aria-hidden="true"></ion-icon>
-			</button>
+
+
 
 			<%
 			String firstName = (String) session.getAttribute("firstName");
@@ -89,45 +95,55 @@ List<Notification> notifications = null;
 			if ("Tutors".equals(type)) {
 			%>
 
-			<%-- <div class="notification-wrapper">
+
+			<div class="search">
+				<form
+					action="<%=request.getContextPath()%>/AdminssionClassController"
+					method="get" class="form-search">
+					<input type="text" placeholder="Search Courses" name="search"
+						value="<%=request.getAttribute("searchQuery") != null ? request.getAttribute("searchQuery") : ""%>">
+					<input type="hidden" name="action" value="searchClass">
+					<button type="submit" class="search-button">
+						<i class="fas fa-search"></i>
+						<!-- Font Awesome icon -->
+					</button>
+				</form>
+			</div>
+
+
+			<div class="notification-wrapper">
 				<button class="header-action-btn" aria-label="notifications"
 					title="Notifications" id="notificationButton">
 					<ion-icon name="notifications-outline" aria-hidden="true"></ion-icon>
-					<span class="btn-badge"><%=notifications.size()%></span>
+					<span class="btn-badge dropdown-item dropdown-header navbar-badge">${fn:length(notifications)}</span>
 				</button>
-				<div class="notification-dropdown" id="notificationDropdown">
+				<div class="dropdown-menu notification-dropdown"
+					id="notificationDropdown">
 					<h4>Notifications</h4>
 					<ul>
-						<!-- Notifications dynamically generated -->
-						<%
-						if (notifications.size() > 0) {
-						%>
-						<%
-						for (Notification notification : notifications) {
-						%>
-						<li class="notification-item"
-							data-notification-id="<%=notification.getId()%>"><a
-							href="<%=request.getContextPath()%>/AdminssionClassController?action=/listClass">
-								<i class="fas fa-envelope mr-2"></i> <%=notification.getMessage()%>
-						</a>
-							<button type="button" class="close remove-notification"
-								aria-label="Close">
-								<span aria-hidden="true">&times;</span>
-							</button></li>
-						<%
-						}
-						%>
-						<%
-						} else {
-						%>
-						<li class="notification-item"><span>No Notifications</span></li>
-						<%
-						}
-						%>
+						<c:choose>
+							<c:when test="${fn:length(notifications) > 0}">
+								<c:forEach var="notification" items="${notifications}">
+									<li class="notification-item"><a
+										href="<%=request.getContextPath()%>/AdminssionClassController?action=/listClass">
+											<i class="fas fa-envelope mr-2"></i> ${notification.message}
+									</a>
+										<button type="button" class="close remove-notification"
+											aria-label="Close" data-notification-id="${notification.id}">
+											<span aria-hidden="true">&times;</span>
+										</button></li>
+								</c:forEach>
+							</c:when>
+							<c:otherwise>
+								<li class="notification-item"><span>No Notifications</span></li>
+							</c:otherwise>
+						</c:choose>
 					</ul>
 					<a href="#" class="see-all">See All Notifications</a>
 				</div>
-			</div> --%>
+			</div>
+
+
 			<%
 			}
 			%>
@@ -135,25 +151,51 @@ List<Notification> notifications = null;
 			<%
 			if ("Parents".equals(type)) {
 			%>
-			<!-- <div class="notification-wrapper">
+			<div class="search">
+				<form
+					action="<%=request.getContextPath()%>/FindTutorClassController"
+					method="get" class="form-search">
+					<input type="text" placeholder="Search Courses" name="search">
+					<input type="hidden" name="action" value="searchClass">
+					<button type="submit" class="search-button">
+						<i class="fas fa-search"></i>
+						<!-- Font Awesome icon -->
+					</button>
+				</form>
+			</div>
+
+			<div class="notification-wrapper">
 				<button class="header-action-btn" aria-label="notifications"
 					title="Notifications" id="notificationButton">
 					<ion-icon name="notifications-outline" aria-hidden="true"></ion-icon>
-					<span class="btn-badge">0</span>
+					<span class="btn-badge dropdown-item dropdown-header navbar-badge">${fn:length(notifications)}</span>
 				</button>
-				<div class="notification-dropdown" id="notificationDropdown">
-					<button class="notification-close-btn"
-						aria-label="close notifications">
-						<ion-icon name="close-outline" aria-hidden="true"></ion-icon>
-					</button>
+				<div class="dropdown-menu notification-dropdown"
+					id="notificationDropdown">
 					<h4>Notifications</h4>
 					<ul>
-						<li><a href="#"><i class="fas fa-envelope mr-2"></i></a> new
-							notifications</li>
+						<c:choose>
+							<c:when test="${fn:length(notifications) > 0}">
+								<c:forEach var="notification" items="${notifications}">
+									<li class="notification-item"><a
+										href="<%=request.getContextPath()%>/FindTutorClassController?action=/listClass">
+											<i class="fas fa-envelope mr-2"></i> ${notification.message}
+									</a>
+										<button type="button" class="close remove-notification"
+											aria-label="Close" data-notification-id="${notification.id}">
+											<span aria-hidden="true">&times;</span>
+										</button></li>
+								</c:forEach>
+							</c:when>
+							<c:otherwise>
+								<li class="notification-item"><span>No Notifications</span></li>
+							</c:otherwise>
+						</c:choose>
 					</ul>
 					<a href="#" class="see-all">See All Notifications</a>
 				</div>
-			</div> -->
+			</div>
+
 			<%
 			}
 			%>
@@ -166,8 +208,7 @@ List<Notification> notifications = null;
                             top: 14px;
                         "></ion-icon>
 				<span class="user-name"
-					style="position: relative; right: -34px; top: -12px; font-size: 16px;"><%=firstName%>
-					<%=lastName%> <!-- <ion-icon name="chevron-down-outline"
+					style="position: relative; right: -34px; top: -12px; font-size: 16px;"> ${sessionScope.firstName} ${sessionScope.lastName} <!-- <ion-icon name="chevron-down-outline"
 						aria-hidden="true" class="submenu-toggle"
 						style="
                                 position: absolute;
@@ -175,7 +216,9 @@ List<Notification> notifications = null;
                                 top: 7px;
                             "></ion-icon> -->
 					<ul class="dropdown">
-						<li><a href="#" class="dropdown_pro">Profile</a></li>
+						<li><a
+							href="<%=request.getContextPath()%>/ProfileUserController?action=/editProfile&id=<%=session.getAttribute("user_id")%>"
+							class="dropdown_pro"> Profile </a></li>
 						<li><a href="<%=request.getContextPath()%>/logout"
 							class="dropdown_log">Logout</a></li>
 					</ul> </span>
@@ -212,7 +255,7 @@ List<Notification> notifications = null;
 	position: absolute;
 	right: 0;
 	top: 40px;
-	width: 300px;
+	width: 370px;
 	background: white;
 	border: 1px solid #ccc;
 	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -270,10 +313,33 @@ List<Notification> notifications = null;
 	background: #eee;
 }
 
-.notification-dropdown .remove-notification {
+/* .notification-dropdown .remove-notification {
 	position: absolute;
 	top: 0;
 	right: 0;
+	background: none;
+	border: none;
+	font-size: 16px;
+	cursor: pointer;
+	color: #888;
+} */
+.notification-item {
+	position: relative;
+	padding-right: 30px;
+}
+
+.notification-item a {
+	display: block;
+	/*    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap; */
+}
+
+.remove-notification {
+	position: absolute;
+	top: 50%;
+	right: 10px;
+	transform: translateY(-50%);
 	background: none;
 	border: none;
 	font-size: 16px;
@@ -284,22 +350,114 @@ List<Notification> notifications = null;
 .notification-dropdown .remove-notification:hover {
 	color: #333;
 }
+
+.header-action-btn {
+	position: relative;
+	z-index: 1;
+}
+
+.search-input {
+	/*   display: none; */
+	width: 250px;
+	padding: 5px 10px;
+	font-size: 16px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	transition: width 0.3s ease;
+	box-sizing: border-box;
+	z-index: 2;
+	position: absolute;
+	right: 31px;
+}
+
+.search {
+	flex-grow: 1;
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+}
+
+.search input[type="text"] {
+	padding: 6px;
+	padding-right: 42px;
+	margin-right: 10px;
+	border: none;
+	font-size: 17px;
+	border-radius: 4px;
+	background: #e5e2e2;
+}
+
+.search-button {
+	position: absolute;
+	right: 20px;
+	top: 9px;
+	background: none;
+	border: none;
+	cursor: pointer;
+	font-size: 18px;
+	color: #333;
+	display: flex;
+	align-items: center;
+}
+
+.search-button i {
+	font-size: 20px; /* Adjust size as needed */
+}
+
+.form-search {
+	display: flex;
+	position: relative;
+}
 </style>
 
 <script>
 $(document).ready(function() {
+	 var type = "<%=type != null ? type : "null"%>";
+	  var userId = "<%=userIdStr != null ? userIdStr : "null"%>";
+	    console.log("Type: " + type);
+	    console.log("User ID: " + userId);
     $('#notificationButton').on('click', function() {
         $('#notificationDropdown').toggle();
     });
 
-    $('.remove-notification').on('click', function() {
-        var notificationId = $(this).closest('.notification-item').data('notification-id');
+    $('.remove-notification').on('click', function(event) {
+    	event.stopPropagation();
+        var notificationId = $(this).data('notification-id');
+        var $notificationItem = $(this).closest('.notification-item');
+        
+        console.log('id : ',notificationId);
         $.ajax({
-            url: '<%=request.getContextPath()%>/RemoveNotificationController',
+            url: '<%=request.getContextPath()%>/NotificationController',
             method: 'POST',
-            data: { id: notificationId },
+            data: { action: 'remove',id: notificationId },
+            contentType: 'application/x-www-form-urlencoded',
             success: function(response) {
-                // Reload notifications or update the UI as needed
+            		console.log('vao day');
+                  // Remove the notification item from the dropdown
+                    $notificationItem.remove();
+                    
+                    // Update the notification badge count
+                    var newCount = parseInt($('.navbar-badge').text()) - 1;
+                    $('.navbar-badge').text(newCount);
+                    
+                    // Update the notification count in the dropdown header
+                    $('.notification-count').text(newCount);
+                    
+                    // If no notifications left, show "No Notifications" but keep the header
+                    if (newCount === 0) {
+                    	 $('#notificationDropdown').html(`
+                                 <h4>Notifications</h4>
+                                 <ul>
+                                     <li class="notification-item"><span>No Notifications</span></li>
+                                 </ul>
+                                 <a href="#" class="see-all">See All Notifications</a>
+                             `);
+                             $('.navbar-badge').text(0);
+                    }
+            },
+            error: function() {
+                alert('Error removing notification.');
+                console.log('loi roi');
             }
         });
         $(this).closest('.notification-item').remove();
@@ -311,4 +469,5 @@ $(document).ready(function() {
         }
     });
 });
+
 </script>

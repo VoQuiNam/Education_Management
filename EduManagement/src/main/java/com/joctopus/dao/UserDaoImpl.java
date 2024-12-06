@@ -109,6 +109,47 @@ public class UserDaoImpl implements UserDao{
             e.printStackTrace();
         }
     }
+	
+	public boolean checkIfUserHasClasses(int userId) throws SQLException {
+	    boolean hasClasses = false;
+	    
+	    try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+	        // Kiểm tra người dùng có lớp hay không
+	        String hql = "SELECT COUNT(c) FROM Classes c WHERE c.users.id = :userId";
+	        Query query = session.createQuery(hql);
+	        query.setParameter("userId", userId);
+	        long count = (long) query.uniqueResult();
+	        
+	        if (count > 0) {
+	            hasClasses = true;  // Người dùng đang tạo lớp
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    
+	    return hasClasses;
+	}
+	
+	public boolean checkIfUserIsEnrolledInClass(int userId) {
+	    boolean isEnrolled = false;
+
+	    try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+	        // Query to check if the user is enrolled in any classes using the Ucl entity
+	        String hql = "SELECT COUNT(ucl) FROM Ucl ucl WHERE ucl.id_user.id = :userId";
+	        Query query = session.createQuery(hql);
+	        query.setParameter("userId", userId);
+
+	        long count = (long) query.uniqueResult();
+	        isEnrolled = count > 0; // User is enrolled if count > 0
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+
+	    return isEnrolled;
+	}
+
+
+
 
 	
 	@Override
@@ -228,22 +269,22 @@ public class UserDaoImpl implements UserDao{
 	}
 	
 	@Override
-	public List<User> selectUsersByType(String type) {
+	public List<User> selectAdminUsers() {
 	    Transaction transaction = null;
 	    List<User> users = null;
 	    Session session = HibernateUtil.getSessionFactory().openSession();
 	    try {
-	        // start a transaction
+	        // Start a transaction
 	        transaction = session.beginTransaction();
 	        
-	        // Query to retrieve users by type
-	        Query query = session.createQuery("FROM User WHERE type = :type");
-	        query.setParameter("type", type);
+	        // Query to retrieve only Admin users
+	        Query query = session.createQuery("FROM User WHERE type = 'Admin'");
 	        
 	        // Execute query and get the users
 	        users = query.list();
+	        System.out.println("Admin users: " + users);
 	        
-	        // commit transaction
+	        // Commit transaction
 	        transaction.commit();
 	    } catch (Exception e) {
 	        if (transaction != null) {
@@ -255,6 +296,7 @@ public class UserDaoImpl implements UserDao{
 	    }
 	    return users;
 	}
+
 	
 	// Implementation of insertUcl method
     @Override

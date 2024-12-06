@@ -24,6 +24,10 @@
 <link rel="stylesheet" href="<c:url value='/css/style.css'/>">
 <link rel="stylesheet" href="<c:url value='/css/iconuser.css'/>">
 
+<%
+String type = (String) session.getAttribute("type");
+%>
+
 <!-- 
     - google font link
   -->
@@ -72,10 +76,33 @@
 						<p class="hero-text">Excepteur sint occaecat cupidatat non
 							proident sunt in culpa qui officia deserunt mollit.</p>
 
-						<a href="#" class="btn has-before"> <span class="span">Find
+					
+
+						<%
+						if (type != null) {
+							if (type.equals("Parents")) {
+						%>
+						<a
+							href="<%=request.getContextPath()%>/FindTutorClassController?action=/listClassParent"
+							class="btn has-before"> <span class="span">Find
 								courses</span> <ion-icon name="arrow-forward-outline"
 								aria-hidden="true"></ion-icon>
 						</a>
+						<%
+						} else if (type.equals("Tutors")) {
+						%>
+
+
+						<a
+							href="<%=request.getContextPath()%>/AdminssionClassController?action=/listClass"
+							class="btn has-before"> <span class="span">Find
+								courses</span> <ion-icon name="arrow-forward-outline"
+								aria-hidden="true"></ion-icon>
+						</a>
+						<%
+						}
+						}
+						%>
 
 					</div>
 
@@ -279,7 +306,7 @@
         - #VIDEO
       -->
 
-			<section class="video has-bg-image" aria-label="video"
+		<%-- 	<section class="video has-bg-image" aria-label="video"
 				style="background-image: url('<c:url value='/images/video-bg.png'/>')">
 				<div class="container">
 
@@ -304,7 +331,7 @@
 					</div>
 
 				</div>
-			</section>
+			</section> --%>
 
 
 
@@ -313,7 +340,7 @@
 			<!-- 
         - #STATE
       -->
-
+<!-- 
 			<section class="section stats" aria-label="stats">
 				<div class="container">
 
@@ -358,13 +385,13 @@
 
 
 
-
+ -->
 
 			<!-- 
         - #BLOG
       -->
 
-			<section class="section blog has-bg-image" id="blog"
+			<%-- <section class="section blog has-bg-image" id="blog"
 				aria-label="blog"
 				style="background-image: url('<c:url value='/images/blog-bg.svg'/>')">
 				<div class="container">
@@ -507,7 +534,7 @@
 						height="186" loading="lazy" alt="" class="shape blog-shape">
 
 				</div>
-			</section>
+			</section> --%>
 
 		</article>
 	</main>

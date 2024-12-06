@@ -97,24 +97,29 @@
 
 
 	<div class="tutor-classes-container">
-		<div class="filter-container">
-			<i class="fas fa-filter filter-icon" id="filter-icon"></i>
-			<div class="filter-dropdown" id="filter-dropdown">
-				<a href="#" data-status="All" class="filter-option">All</a> <a href="#"
-					data-status="New" class="filter-option">New</a> <a href="#"
-					data-status="Teaching" class="filter-option">Teaching</a> <a
-					href="#" data-status="Success" class="filter-option">Success</a>
+			<div class="filter-container">
+				<i class="fas fa-filter filter-icon" id="filter-icon"></i>
+				<div class="filter-dropdown" id="filter-dropdown">
+					<a href="#" data-status="All" class="filter-option">All</a> <a
+						href="#" data-status="New" class="filter-option">New</a> <a
+						href="#" data-status="Teaching" class="filter-option">Teaching</a>
+					<a href="#" data-status="Success" class="filter-option">Success</a>
+				</div>
 			</div>
-		</div>
-
 
 		<a type="button" class="create-btn"
 			href="<%=request.getContextPath()%>/AdminssionClassController?action=/newClass"
 			style="margin-top: 73px;">Create Class</a>
 
+		<!-- Initialize a flag to check for approved classes -->
+		<c:set var="hasApprovedClasses" value="false" />
+
 		<ul class="tutor-classes-list">
 			<c:forEach var="classes" items="${listClass}">
 				<c:if test="${classes.requeststatus ne 'Unapproved'}">
+					<!-- Set the flag to true if there's at least one approved class -->
+					<c:set var="hasApprovedClasses" value="true" />
+
 					<li class="tutor-class-item">
 						<h2>Class Name: ${classes.class_name}</h2>
 						<p>
@@ -143,17 +148,17 @@
 							</c:when>
 						</c:choose>
 
-
 						<form
 							action="<%=request.getContextPath()%>/AdminssionClassController"
 							method="post" style="display: inline-block;">
-
 							<input type="hidden" name="id" value="${classes.id}">
 							<c:choose>
 								<c:when test="${classes.users.type eq 'Tutors'}">
 									<input type="hidden" name="action" value="confirmTeach">
-									 <button type="submit" class="register-btn confirm" data-class-id="${classes.id}"
-                                <c:if test="${classes.status eq 'Success'}">disabled</c:if>>Confirm Class</button>
+									<button type="submit" class="register-btn confirm"
+										data-class-id="${classes.id}"
+										<c:if test="${classes.status eq 'Success'}">disabled</c:if>>Confirm
+										Class</button>
 								</c:when>
 								<c:otherwise>
 									<input type="hidden" name="action" value="registerClass">
@@ -168,14 +173,22 @@
 							method="post" style="display: inline-block;">
 							<input type="hidden" name="id" value="${classes.id}"> <input
 								type="hidden" name="action" value="cancelClass">
-							  <button type="submit" class="cancel-btn" data-class-id="${classes.id}"
-                        <c:if test="${classes.status eq 'Success'}">disabled</c:if>>Cancel Class</button>
+							<button type="submit" class="cancel-btn"
+								data-class-id="${classes.id}"
+								<c:if test="${classes.status eq 'Success'}">disabled</c:if>>Cancel
+								Class</button>
 						</form>
 					</li>
 				</c:if>
 			</c:forEach>
 		</ul>
+
+		<!-- Display "No data found" if no approved classes exist -->
+		<c:if test="${empty listClass || !hasApprovedClasses}">
+			<p class="no-data-message">No data found</p>
+		</c:if>
 	</div>
+
 
 	<script>
 	document.addEventListener('DOMContentLoaded', function () {

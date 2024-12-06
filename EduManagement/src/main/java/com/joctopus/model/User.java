@@ -50,6 +50,19 @@ public class User{
 
 	
 	public User(int id, String firstName, String lastName, LocalDate dob, String gender, String address,
+			String phoneNumber) {
+		super();
+		this.id = id;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.dob = dob;
+		this.gender = gender;
+		this.address = address;
+		this.phoneNumber = phoneNumber;
+	}
+
+
+	public User(int id, String firstName, String lastName, LocalDate dob, String gender, String address,
 			String phoneNumber, String account, String password) {
 		super();
 		this.id = id;

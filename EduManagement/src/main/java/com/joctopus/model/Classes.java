@@ -99,26 +99,6 @@ public class Classes {
 
 
 
-
-
-//	public Classes(int id, String class_name, String eduClass, LocalDate study_time, String subject, String address,
-//			String session, String status, String requeststatus, User users) {
-//		super();
-//		this.id = id;
-//		this.class_name = class_name;
-//		this.eduClass = eduClass;
-//		this.study_time = study_time;
-//		this.subject = subject;
-//		this.address = address;
-//		this.session = session;
-//		this.status = status;
-//		this.requeststatus = requeststatus;
-//		this.users = users;
-//	}
-
-
-
-
 	public Classes(String class_name, String eduClass, LocalDate study_time, String subject, String address,
 			String session, String status, String requeststatus, User users) {
 		super();

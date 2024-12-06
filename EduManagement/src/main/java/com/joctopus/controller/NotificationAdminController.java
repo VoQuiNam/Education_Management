@@ -5,7 +5,10 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
 import java.io.IOException;
+import java.util.List;
 
 import com.joctopus.dao.ClassesDao;
 import com.joctopus.dao.ClassesDaoImpl;
@@ -13,6 +16,8 @@ import com.joctopus.dao.NotificationAdminDao;
 import com.joctopus.dao.NotificationAdminDaoImpl;
 import com.joctopus.dao.NotificationDao;
 import com.joctopus.dao.NotificationDaoImpl;
+import com.joctopus.model.Notification;
+import com.joctopus.model.Notification_clients;
 
 @WebServlet("/NotificationAdminController")
 public class NotificationAdminController extends HttpServlet {
@@ -31,8 +36,16 @@ public class NotificationAdminController extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		response.getWriter().append("Served at: ").append(request.getContextPath());
+		HttpSession session = request.getSession();
+        String userType = (String) session.getAttribute("type");
+
+        if ("Admin".equals(userType)) {
+            List<Notification_clients> notifications = notificationDao.selectAllNotifications();
+            request.setAttribute("notifications", notifications);
+            request.getRequestDispatcher(request.getContextPath() + "/WEB-INF/fragments/menuclient.jsp").forward(request, response);
+        } else {
+            response.sendRedirect(request.getContextPath() + "/error.jsp");
+        }
 	}
 
 	/**

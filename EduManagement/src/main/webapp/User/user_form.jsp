@@ -9,11 +9,11 @@
 	padding: 20px;
 }
 
- .error-message {
-        color: red;
-        font-size: 14px;
-        margin-top: 5px; 
-    }
+.error-message {
+	color: red;
+	font-size: 14px;
+	margin-top: 5px;
+}
 </style>
 <!DOCTYPE html>
 <html lang="en">
@@ -27,10 +27,14 @@
 				<div class="card">
 					<div class="card-body">
 						<c:if test="${User != null}">
-							<form action="<%=request.getContextPath()%>/UserController?action=/update" method="post">
+							<form
+								action="<%=request.getContextPath()%>/UserController?action=/update"
+								method="post">
 						</c:if>
 						<c:if test="${User == null}">
-							<form action="<%=request.getContextPath()%>/UserController?action=/insert" method="post">
+							<form
+								action="<%=request.getContextPath()%>/UserController?action=/insert"
+								method="post">
 						</c:if>
 
 						<caption>
@@ -48,80 +52,82 @@
 							<input type="hidden" name="id"
 								value="<c:out value='${User.id}' />" />
 						</c:if>
-
+						<!-- requestScope là một đối tượng hoặc phạm vi (scope) được cung cấp bởi JSP (Java Server Pages), 
+						dùng để lưu trữ và truy xuất các thuộc tính hoặc giá trị chỉ tồn tại trong vòng đời của một request HTTP. -->
 						<fieldset class="form-group">
 							<label>First name</label> <input type="text"
-								value="<c:out value='${User.firstName}' />" class="form-control"
-								name="first_name">
-							<span class="text-danger">${requestScope.first_name_error}</span>
+								value="<c:out value='${requestScope.first_name != null ? requestScope.first_name : User.firstName}' />"
+								class="form-control" name="first_name"> <span
+								class="text-danger">${requestScope.first_name_error}</span>
 						</fieldset>
 
 						<fieldset class="form-group">
 							<label>Last name</label> <input type="text"
-								value="<c:out value='${User.lastName}' />" class="form-control"
-								name="last_name">
-								<span class="text-danger">${requestScope.last_name_error}</span>
+								value="<c:out value='${requestScope.last_name != null ? requestScope.last_name : User.lastName}' />"
+								class="form-control" name="last_name"> <span
+								class="text-danger">${requestScope.last_name_error}</span>
 						</fieldset>
 
 						<fieldset class="form-group">
-							<label>Date</label> 
-							<input type="date"
-								value="<c:out value='${User.dob}' />" class="form-control"
-								name="DOB">
-								<span class="text-danger">${requestScope.dob_error}</span>
+							<label>Date</label> <input type="date"
+								value="<c:out value='${requestScope.dob != null ? requestScope.dob : User.dob}' />"
+								class="form-control" name="DOB"> <span
+								class="text-danger">${requestScope.dob_error}</span>
 						</fieldset>
 
+
 						<fieldset class="form-group">
-							<label>Gender</label> 
-							<select class="form-control" name="gender">
-								<option value="" ${empty User.gender ? 'selected' : ''}>Select</option>
+							<label>Gender</label> <select class="form-control" name="gender">
+								<option value=""
+									${empty requestScope.gender && empty User.gender ? 'selected' : ''}>Select</option>
 								<option value="Female"
-									${User.gender eq 'Female' ? 'selected' : ''}>Female</option>
-								<option value="Male" ${User.gender eq 'Male' ? 'selected' : ''}>Male</option>
-							</select>
-							<span class="text-danger">${requestScope.gender_error}</span>
+									${requestScope.gender eq 'Female' || User.gender eq 'Female' ? 'selected' : ''}>Female</option>
+								<option value="Male"
+									${requestScope.gender eq 'Male' || User.gender eq 'Male' ? 'selected' : ''}>Male</option>
+							</select> <span class="text-danger">${requestScope.gender_error}</span>
 						</fieldset>
+
 
 						<fieldset class="form-group">
 							<label>Address</label> <input type="text"
-								value="<c:out value='${User.address}' />" class="form-control"
-								name="address">
-								<span class="text-danger">${requestScope.address_error}</span>
+								value="<c:out value='${requestScope.address != null ? requestScope.address : User.address}' />"
+								class="form-control" name="address"> <span
+								class="text-danger">${requestScope.address_error}</span>
 						</fieldset>
 
 						<fieldset class="form-group">
 							<label>Phone number</label> <input type="text"
-								value="<c:out value='${User.phoneNumber}' />"
-								class="form-control" name="phone_number">
-								<span class="text-danger">${requestScope.phone_number_error}</span>
+								value="<c:out value='${requestScope.phone_number != null ? requestScope.phone_number : User.phoneNumber}' />"
+								class="form-control" name="phone_number"> <span
+								class="text-danger">${requestScope.phone_number_error}</span>
 						</fieldset>
 
 						<fieldset class="form-group">
 							<label>Account</label> <input type="text"
-								value="<c:out value='${User.account}' />" class="form-control"
-								name="account">
-								<span class="text-danger">${requestScope.account_error}</span>
+								value="<c:out value='${requestScope.account != null ? requestScope.account : User.account}' />"
+								class="form-control" name="account"> <span
+								class="text-danger">${requestScope.account_error}</span>
 						</fieldset>
 
 						<fieldset class="form-group">
 							<label>Pass</label> <input type="password"
-								value="<c:out value='${User.password}' />" class="form-control"
-								name="password">
-							
-							<span class="text-danger">${requestScope.password_error}</span>
+								value="<c:out value='${requestScope.password != null ? requestScope.password : User.password}' />"
+								class="form-control" name="password"> <span
+								class="text-danger">${requestScope.password_error}</span>
 						</fieldset>
 
 						<fieldset class="form-group">
 							<label for="type">Type</label> <select class="form-control"
 								id="type" name="type">
-								<option value="" ${empty User.type ? 'selected' : ''}>Select</option>
-								<option value="Admin" ${User.type eq 'Admin' ? 'selected' : ''}>Admin</option>
+								<option value=""
+									${empty requestScope.type && empty User.type ? 'selected' : ''}>Select</option>
+								<option value="Admin"
+									${requestScope.type eq 'Admin' || User.type eq 'Admin' ? 'selected' : ''}>Admin</option>
 								<option value="Parents"
-									${User.type eq 'Parents' ? 'selected' : ''}>Parents</option>
+									${requestScope.type eq 'Parents' || User.type eq 'Parents' ? 'selected' : ''}>Parents</option>
 								<option value="Tutors"
-									${User.type eq 'Tutors' ? 'selected' : ''}>Tutors</option>
-							</select>
-							<span class="text-danger">${requestScope.type_error}</span>
+									${requestScope.type eq 'Tutors' || User.type eq 'Tutors' ? 'selected' : ''}>Tutors</option>
+							</select> <span class="text-danger">${requestScope.type_error}</span>
 						</fieldset>
 
 
@@ -140,5 +146,5 @@
 </html>
 
 <script>
-
+	
 </script>

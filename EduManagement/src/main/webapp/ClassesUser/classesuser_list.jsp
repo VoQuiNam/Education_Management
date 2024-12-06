@@ -39,25 +39,38 @@
 										class="btn btn-primary">Add</a>
 								</div>
 								<div class="card-body">
-									<table id="example1" class="table table-bordered table-striped">
-										<thead>
-											<tr>
-												<th>User Id</th>
-												<th>Class Id</th>
-											</tr>
-										</thead>
-										<tbody>
-											<c:forEach var="classesuser" items="${listUcl}">
-												<tr>
-													<td><c:out value="${classesuser.id_user.account}" /></td>
-													<td><c:out value="${classesuser.class_id.class_name}" /></td>
-													<td class="action-buttons"><a
-														href="<%=request.getContextPath()%>/ClassesUserController?action=/deleteUCL&id_user=${classesuser.id_user.id}&class_id=${classesuser.class_id.id}"
-														class="btn btn-danger delete-button">Delete</a></td>
-												</tr>
-											</c:forEach>
-										</tbody>
-									</table>
+									<c:choose>
+										
+										<c:when test="${empty listUcl}">
+											<div class="alert alert-warning" role="alert">No user
+												details available.</div>
+										</c:when>
+									
+										<c:otherwise>
+											<table id="example1"
+												class="table table-bordered table-striped">
+												<thead>
+													<tr>
+														<th>User Id</th>
+														<th>Class Id</th>
+														<th>Actions</th>
+													</tr>
+												</thead>
+												<tbody>
+													<c:forEach var="classesuser" items="${listUcl}">
+														<tr>
+															<td><c:out value="${classesuser.id_user.account}" /></td>
+															<td><c:out
+																	value="${classesuser.class_id.class_name}" /></td>
+															<td class="action-buttons"><a
+																href="<%=request.getContextPath()%>/ClassesUserController?action=/deleteUCL&id_user=${classesuser.id_user.id}&class_id=${classesuser.class_id.id}"
+																class="btn btn-danger delete-button">Delete</a></td>
+														</tr>
+													</c:forEach>
+												</tbody>
+											</table>
+										</c:otherwise>
+									</c:choose>
 								</div>
 							</div>
 						</div>

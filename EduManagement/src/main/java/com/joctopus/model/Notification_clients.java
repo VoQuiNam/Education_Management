@@ -5,8 +5,8 @@ import java.time.LocalDate;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "notifications")
-public class Notification {
+@Table(name = "notification_clients")
+public class Notification_clients {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -23,17 +23,17 @@ public class Notification {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user_id;
+    private User userId;
 
-    public Notification() {
+    public Notification_clients() {
         // Default constructor
     }
 
-    public Notification(String message, boolean isRead, String type,  User user_id) {
+    public Notification_clients(String message, boolean isRead, String type,  User userId) {
         this.message = message;
         this.is_read = isRead;
         this.type = type;
-        this.user_id = user_id;
+        this.userId = userId;
     }
 
     // Getters and setters
@@ -72,10 +72,10 @@ public class Notification {
     }
 
     public User getUserId() {
-        return user_id;
+        return userId;
     }
 
-    public void setUserId(User user_id) {
-        this.user_id = user_id;
+    public void setUserId(User userId) {
+        this.userId = userId;
     }
 }

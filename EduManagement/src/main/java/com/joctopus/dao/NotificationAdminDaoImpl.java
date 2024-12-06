@@ -15,7 +15,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
-import com.joctopus.model.Notification;
+import com.joctopus.model.Notification_clients;
 import com.joctopus.util.HibernateUtil;
 
 public class NotificationAdminDaoImpl implements NotificationAdminDao {
@@ -30,7 +30,7 @@ public class NotificationAdminDaoImpl implements NotificationAdminDao {
     }
 
     @Override
-    public void insertNotification(Notification notification) {
+    public void insertNotification(Notification_clients notification) {
         Session session = sessionFactory.openSession();
         Transaction transaction = null;
         try {
@@ -48,11 +48,11 @@ public class NotificationAdminDaoImpl implements NotificationAdminDao {
     }
 
     @Override
-    public List<Notification> selectAllNotifications() {
+    public List<Notification_clients> selectAllNotifications() {
         Session session = sessionFactory.openSession();
-        List<Notification> notifications = null;
+        List<Notification_clients> notifications = null;
         try {
-            notifications = session.createQuery("FROM Notification", Notification.class).list();
+            notifications = session.createQuery("FROM Notification_clients", Notification_clients.class).list();
         } finally {
             session.close();
         }
@@ -65,7 +65,7 @@ public class NotificationAdminDaoImpl implements NotificationAdminDao {
         Transaction transaction = null;
         try {
             transaction = session.beginTransaction();
-            Notification notification = session.get(Notification.class, notificationId);
+            Notification_clients notification = session.get(Notification_clients.class, notificationId);
             if (notification != null) {
                 notification.setRead(true);
                 session.update(notification);
@@ -87,7 +87,7 @@ public class NotificationAdminDaoImpl implements NotificationAdminDao {
         try (Session session = sessionFactory.openSession()) {
             Transaction transaction = session.beginTransaction();
             try {
-                Notification notification = session.get(Notification.class, notificationId);
+            	Notification_clients notification = session.get(Notification_clients.class, notificationId);
                 if (notification != null) {
                     session.delete(notification);
                 }
