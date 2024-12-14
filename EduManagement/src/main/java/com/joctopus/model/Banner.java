@@ -28,49 +28,33 @@ public class Banner {
 	@Column(name = "ImageUrl")
 	protected String ImageUrl;
 
-	@Column(name = "StartDate")
-	protected LocalDate StartDate;
-
-	@Column(name = "EndDate")
-	protected LocalDate EndDate;
-
 	@Column(name = "IsActive")
 	protected boolean IsActive;
 
 	@Column(name = "Position")
 	protected String Position;
 
-	@Column(name = "OrderIndex")
-	protected int OrderIndex;
-
 	public Banner() {
 	}
 
-	public Banner(int bannerID, String title, String description, String imageUrl, LocalDate startDate,
-			LocalDate endDate, boolean isActive, String position, int orderIndex) {
+	public Banner(int bannerID, String title, String description, String imageUrl, boolean isActive, String position) {
 		super();
 		this.BannerID = bannerID;
 		this.Title = title;
 		this.Description = description;
 		this.ImageUrl = imageUrl;
-		this.StartDate = startDate;
-		this.EndDate = endDate;
 		this.IsActive = isActive;
 		this.Position = position;
-		this.OrderIndex = orderIndex;
 	}
 
-	public Banner(String title, String description, String imageUrl, LocalDate startDate, LocalDate endDate,
-			boolean isActive, String position, int orderIndex) {
+	public Banner(String title, String description, String imageUrl,
+			boolean isActive, String position) {
 		super();
 		this.Title = title;
 		this.Description = description;
 		this.ImageUrl = imageUrl;
-		this.StartDate = startDate;
-		this.EndDate = endDate;
 		this.IsActive = isActive;
 		this.Position = position;
-		this.OrderIndex = orderIndex;
 	}
 
 	public int getBannerID() {
@@ -105,21 +89,6 @@ public class Banner {
 		this.ImageUrl = imageUrl;
 	}
 
-	public LocalDate getStartDate() {
-		return StartDate;
-	}
-
-	public void setStartDate(LocalDate startDate) {
-		this.StartDate = startDate;
-	}
-
-	public LocalDate getEndDate() {
-		return EndDate;
-	}
-
-	public void setEndDate(LocalDate endDate) {
-		this.EndDate = endDate;
-	}
 
 	public boolean isIsActive() {
 		return IsActive;
@@ -136,13 +105,4 @@ public class Banner {
 	public void setPosition(String position) {
 		this.Position = position;
 	}
-
-	public int getOrderIndex() {
-		return OrderIndex;
-	}
-
-	public void setOrderIndex(int orderIndex) {
-		this.OrderIndex = orderIndex;
-	}
-
 }

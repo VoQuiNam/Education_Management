@@ -1,5 +1,6 @@
 package com.joctopus.controller;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -13,13 +14,18 @@ import com.joctopus.model.User;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
+
 import java.io.PrintWriter;
 
 @WebServlet("/UserController")
+@MultipartConfig(fileSizeThreshold = 1024 * 1024 * 5, maxFileSize = 1024 * 1024 * 50, maxRequestSize = 1024 * 1024
+		* 200)
 public class UserController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private UserDao usersDAO;
@@ -61,14 +67,13 @@ public class UserController extends HttpServlet {
 			default:
 				listUser(request, response);
 				break;
-			
+
 			}
 		} catch (SQLException ex) {
 			throw new ServletException(ex);
 		}
 	}
-	
-	
+
 	private void showNewForm(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		RequestDispatcher dispatcher = request.getRequestDispatcher("User/user_form.jsp");
@@ -113,11 +118,11 @@ public class UserController extends HttpServlet {
 		LocalDate DOB = null;
 		if (dobParam != null && !dobParam.isEmpty()) {
 			DOB = LocalDate.parse(dobParam);
-			
-			 if (DOB.getYear() < 1950) {
-		            request.setAttribute("dob_error", "Date of birth cannot be earlier than 1950.");
-		            hasError = true;
-		        }
+
+			if (DOB.getYear() < 1950) {
+				request.setAttribute("dob_error", "Date of birth cannot be earlier than 1950.");
+				hasError = true;
+			}
 		} else {
 			DOB = LocalDate.now(); // hoặc bất kỳ ngày mặc định nào khác phù hợp với bạn
 		}
@@ -214,18 +219,49 @@ public class UserController extends HttpServlet {
 			// Đặt biến hasError thành true để biểu thị rằng có lỗi được phát hiện
 			hasError = true;
 		}
-		
-		 // Lưu các giá trị đã nhập vào request
-	    request.setAttribute("id", id);
-	    request.setAttribute("first_name", first_name);
-	    request.setAttribute("last_name", last_name);
-	    request.setAttribute("dob", dobParam);
-	    request.setAttribute("gender", gender);
-	    request.setAttribute("address", address);
-	    request.setAttribute("phone_number", phone_number);
-	    request.setAttribute("account", account);
-	    request.setAttribute("password", password);
-	    request.setAttribute("type", type);
+
+		// Đường dẫn để lưu ảnh
+		String uploadPath = getServletContext().getRealPath("") + File.separator + "images";
+		File uploadDir = new File(uploadPath);
+
+		// Kiểm tra thư mục lưu ảnh, nếu chưa có thì tạo mới
+		if (!uploadDir.exists()) {
+			uploadDir.mkdir();
+		}
+
+		// Xử lý ảnh (nếu có)
+		String dbFileName = null;
+		Part filePart = request.getPart("image");
+		if (filePart != null && filePart.getSize() > 0) {
+			// Nếu có ảnh mới, lưu ảnh mới và lấy tên file
+			String fileName = extractFileName(filePart);
+			String filePath = uploadPath + File.separator + fileName;
+			filePart.write(filePath); // Lưu file vào thư mục
+			dbFileName = "images/" + fileName;
+		} else {
+			// Nếu không có ảnh mới, sử dụng ảnh cũ
+			dbFileName = request.getParameter("currentImage"); // Ảnh cũ từ input hidden
+		}
+
+		// Kiểm tra xem đường dẫn ảnh có hợp lệ không
+		if (dbFileName == null || dbFileName.isEmpty()) {
+			throw new ServletException(
+					"ImageUrl cannot be null. Please upload an image or provide a valid current image.");
+		}
+
+		// Lưu các giá trị đã nhập vào request
+		request.setAttribute("id", id);
+		request.setAttribute("first_name", first_name);
+		request.setAttribute("last_name", last_name);
+		request.setAttribute("dob", dobParam);
+		request.setAttribute("gender", gender);
+		request.setAttribute("address", address);
+		request.setAttribute("phone_number", phone_number);
+		request.setAttribute("account", account);
+		request.setAttribute("password", password);
+		request.setAttribute("type", type);
+		request.setAttribute("image", filePart);
+
 
 		// Nếu có lỗi, hiển thị lại form với thông báo lỗi
 		if (hasError) {
@@ -235,7 +271,7 @@ public class UserController extends HttpServlet {
 		}
 
 		User updateUser = new User(id, first_name, last_name, DOB, gender, address, phone_number, account, password,
-				type);
+				type, dbFileName);
 
 		usersDAO.updateUser(updateUser);
 
@@ -397,6 +433,20 @@ public class UserController extends HttpServlet {
 			hasError = true;
 		}
 
+		// Handle file upload
+		String uploadPath = getServletContext().getRealPath("") + File.separator + "images";
+		File uploadDir = new File(uploadPath);
+		if (!uploadDir.exists()) {
+			uploadDir.mkdir();
+		}
+
+		Part filePart = request.getPart("image");
+		String fileName = extractFileName(filePart);
+		String filePath = uploadPath + File.separator + fileName;
+
+		filePart.write(filePath); // Save file to the specified directory
+		String dbFileName = "images/" + fileName;
+
 		// Nếu có lỗi, hiển thị lại form với thông báo lỗi
 		if (hasError) {
 			RequestDispatcher dispatcher = request.getRequestDispatcher("User/user_form.jsp");
@@ -407,40 +457,48 @@ public class UserController extends HttpServlet {
 		// Nếu không có lỗi, tiến hành chèn người dùng vào cơ sở dữ liệu và chuyển hướng
 		// đến trang danh sách
 		LocalDate dob = LocalDate.parse(dobParam);
-		User newUser = new User(first_name, last_name, dob, gender, address, phone_number, account, password, type);
+		User newUser = new User(first_name, last_name, dob, gender, address, phone_number, account, password, type,
+				dbFileName);
 		usersDAO.insertUser(newUser);
 		response.sendRedirect("UserController?action=/list");
 	}
 
-
-	private void deleteUser(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
-	    int id = Integer.parseInt(request.getParameter("id"));
-
-	    // Kiểm tra nếu người dùng đang tạo lớp
-	    boolean hasClasses = usersDAO.checkIfUserHasClasses(id);
-
-	    // Kiểm tra nếu người dùng đang học trong lớp
-	    boolean isEnrolledInClass = usersDAO.checkIfUserIsEnrolledInClass(id);
-
-	    if (hasClasses) {
-	        // Nếu người dùng đang tạo lớp
-	        request.getSession().setAttribute("errorMessage", "User has created classes, cannot be deleted.");
-	    } else if (isEnrolledInClass) {
-	        // Nếu người dùng đang học trong lớp
-	        request.getSession().setAttribute("errorMessage", "User is enrolled in a class, cannot be deleted.");
-	    }
-
-	    if (hasClasses || isEnrolledInClass) {
-	        // Redirect to the list page with the error message
-	        response.sendRedirect("UserController?action=/list");
-	    } else {
-	        // Nếu không, tiến hành xóa người dùng
-	        usersDAO.deleteUser(id);
-	        response.sendRedirect("UserController?action=/list");
-	    }
+	private String extractFileName(Part part) { // chứa thông tin dữ liệu về cách xử lí
+		String contentDisp = part.getHeader("content-disposition");
+		for (String content : contentDisp.split(";")) {
+			// kiem tra xem chuỗi có bắt đầu tữ khóa file name ko
+			if (content.trim().startsWith("filename")) {
+				return content.substring(content.indexOf("=") + 2, content.length() - 1);
+			}
+		}
+		return "";
 	}
 
+	private void deleteUser(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
+		int id = Integer.parseInt(request.getParameter("id"));
 
+		// Kiểm tra nếu người dùng đang tạo lớp
+		boolean hasClasses = usersDAO.checkIfUserHasClasses(id);
 
+		// Kiểm tra nếu người dùng đang học trong lớp
+		boolean isEnrolledInClass = usersDAO.checkIfUserIsEnrolledInClass(id);
+
+		if (hasClasses) {
+			// Nếu người dùng đang tạo lớp
+			request.getSession().setAttribute("errorMessage", "User has created classes, cannot be deleted.");
+		} else if (isEnrolledInClass) {
+			// Nếu người dùng đang học trong lớp
+			request.getSession().setAttribute("errorMessage", "User is enrolled in a class, cannot be deleted.");
+		}
+
+		if (hasClasses || isEnrolledInClass) {
+			// Redirect to the list page with the error message
+			response.sendRedirect("UserController?action=/list");
+		} else {
+			// Nếu không, tiến hành xóa người dùng
+			usersDAO.deleteUser(id);
+			response.sendRedirect("UserController?action=/list");
+		}
+	}
 
 }

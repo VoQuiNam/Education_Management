@@ -90,6 +90,14 @@ public class BannerController extends HttpServlet {
 		List<Banner> listBanner = bannerDao.selectAllBanners();
 		System.out.println("Banners retrieved: " + listBanner.size()); // chuyển dữ liệu từ serlvet qua jsp để hiển thị
 																		// dữ liệu cho người dùng
+
+		/*
+		 * // Sắp xếp danh sách listBanner.sort((b1, b2) -> { // Nếu cả hai đều có
+		 * isActive giống nhau, sắp xếp theo orderIndex if (b1.isIsActive() ==
+		 * b2.isIsActive()) { return Integer.compare(b1.getOrderIndex(),
+		 * b2.getOrderIndex()); } // Ưu tiên isActive == true lên trước return
+		 * b1.isIsActive() ? -1 : 1; });
+		 */
 		request.setAttribute("listBanner", listBanner);
 		RequestDispatcher dispatcher = request.getRequestDispatcher("Banner/BannerList.jsp");
 		dispatcher.forward(request, response);
@@ -99,20 +107,13 @@ public class BannerController extends HttpServlet {
 			throws SQLException, IOException, ServletException {
 		String Title = request.getParameter("Title");
 		String Description = request.getParameter("Description");
-		String StartDate = request.getParameter("StartDate");
-		LocalDate startDate = LocalDate.parse(StartDate);
-		String EndDate = request.getParameter("EndDate");
-		LocalDate endDate = LocalDate.parse(EndDate);
 		boolean IsActive = Boolean.parseBoolean(request.getParameter("IsActive"));
 		String Position = request.getParameter("Position");
-		int orderIndex = Integer.parseInt(request.getParameter("OrderIndex"));
 
-		// Handle file upload // File.separator: Provides the system-specific file
-		// separator (e.g., / on // Linux/macOS, \ on Windows).
+
+		// Handle file upload
 		String uploadPath = getServletContext().getRealPath("") + File.separator + "images";
 		File uploadDir = new File(uploadPath);
-
-		// kiểm tra xem có thư mục images chưa,nếu chưa thì // lệnh mkdir sẽ tạo thư mục
 		if (!uploadDir.exists()) {
 			uploadDir.mkdir();
 		}
@@ -124,9 +125,9 @@ public class BannerController extends HttpServlet {
 		filePart.write(filePath); // Save file to the specified directory
 		String dbFileName = "images/" + fileName;
 
+
 		// Save to the database using Hibernate or your DAO
-		Banner newBanner = new Banner(Title, Description, dbFileName, startDate, endDate, IsActive, Position,
-				orderIndex);
+		Banner newBanner = new Banner(Title, Description, dbFileName, IsActive, Position);
 		bannerDao.insertBanners(newBanner);
 
 		response.sendRedirect("BannerController?action=/listBanner");
@@ -144,12 +145,20 @@ public class BannerController extends HttpServlet {
 	}
 
 	private void deleteBanner(HttpServletRequest request, HttpServletResponse response)
-			throws SQLException, IOException {
-		int id = Integer.parseInt(request.getParameter("BannerID"));
-		bannerDao.deleteBanner(id);
-		response.sendRedirect("BannerController?action=/listBanner");
+	        throws SQLException, IOException {
+	    int id = Integer.parseInt(request.getParameter("BannerID"));
+
+	    // Step 1: Fetch the banner to get its OrderIndex before deleting it
+	    Banner deletedBanner = bannerDao.selectBanners(id);
+
+	    // Step 2: Delete the banner
+	    bannerDao.deleteBanner(id);
+
+	    // Step 4: Redirect to the list of banners
+	    response.sendRedirect("BannerController?action=/listBanner");
 	}
 
+	
 	private void updateUser(HttpServletRequest request, HttpServletResponse response)
 			throws SQLException, IOException, ServletException {
 
@@ -161,29 +170,10 @@ public class BannerController extends HttpServlet {
 		String Title = request.getParameter("Title");
 		String Description = request.getParameter("Description");
 
-		// Xử lý StartDate
-		String StartDate = request.getParameter("StartDate");
-		LocalDate startDate = null;
-		if (StartDate != null && !StartDate.isEmpty()) {
-			startDate = LocalDate.parse(StartDate); // Chuyển đổi sang LocalDate nếu không rỗng
-		} else {
-			startDate = LocalDate.now(); // Ngày mặc định nếu không có giá trị
-		}
-
-		// Xử lý EndDate
-		String EndDate = request.getParameter("EndDate");
-		LocalDate endDate = null;
-		if (EndDate != null && !EndDate.isEmpty()) {
-			endDate = LocalDate.parse(EndDate); // Chuyển đổi sang LocalDate nếu không rỗng
-		} else {
-			endDate = LocalDate.now(); // Ngày mặc định nếu không có giá trị
-		}
 
 		// Xử lý các tham số khác
 		Boolean IsActive = Boolean.parseBoolean(request.getParameter("IsActive"));
 		String Position = request.getParameter("Position");
-		int orderIndex = Integer.parseInt(request.getParameter("OrderIndex"));
-
 		// Đường dẫn để lưu ảnh
 		String uploadPath = getServletContext().getRealPath("") + File.separator + "images";
 		File uploadDir = new File(uploadPath);
@@ -207,6 +197,7 @@ public class BannerController extends HttpServlet {
 			dbFileName = request.getParameter("currentImage"); // Ảnh cũ từ input hidden
 		}
 
+
 		// Kiểm tra xem đường dẫn ảnh có hợp lệ không
 		if (dbFileName == null || dbFileName.isEmpty()) {
 			throw new ServletException(
@@ -221,8 +212,7 @@ public class BannerController extends HttpServlet {
 		}
 
 		// Tạo đối tượng Banner từ thông tin đã nhận
-		Banner updateBanner = new Banner(id, Title, Description, dbFileName, startDate, endDate, IsActive, Position,
-				orderIndex);
+		Banner updateBanner = new Banner(id, Title, Description, dbFileName, IsActive, Position);
 
 		// Cập nhật banner thông qua DAO
 		bannerDao.updateBanner(updateBanner);

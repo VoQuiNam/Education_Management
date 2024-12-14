@@ -8,7 +8,6 @@
 <%@ page import="com.joctopus.dao.NotificationDaoImpl"%>
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-
 <%
 String type = (String) session.getAttribute("type");
 NotificationDao notificationDao = new NotificationDaoImpl();
@@ -51,7 +50,7 @@ if (userIdStr != null) {
 			<ul class="navbar-list">
 
 				<li class="navbar-item"><a
-					href="<%=request.getContextPath()%>/HomeClientController"
+					href="<%=request.getContextPath()%>/HomeClientController?action=/listBanners"
 					class="navbar-link" data-nav-link>Home</a></li>
 
 				<%

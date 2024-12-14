@@ -9,10 +9,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.google.gson.Gson;
 import com.joctopus.dao.ClassesDao;
 import com.joctopus.dao.ClassesDaoImpl;
 import com.joctopus.dao.NotificationAdminDao;
@@ -48,6 +50,7 @@ public class AdminssionClassController extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String action = request.getParameter("action");
+		
 
 		try {
 			switch (action) {
@@ -69,6 +72,9 @@ public class AdminssionClassController extends HttpServlet {
 			case "searchClass":
 				searchClasses(request, response);
 				break;
+			case "viewClassDetails":
+			    viewClassDetails(request, response);
+			    break;
 			default:
 				listClasses(request, response);
 				break;
@@ -98,6 +104,29 @@ public class AdminssionClassController extends HttpServlet {
 			throw new ServletException(ex);
 		}
 	}
+	
+	
+	private void viewClassDetails(HttpServletRequest request, HttpServletResponse response)
+	        throws ServletException, IOException {
+	    int id = Integer.parseInt(request.getParameter("id")); // Lấy ID từ request
+	    Classes classes = classesDao.selectClasses(id);
+	    if (classes == null) {
+	        // Gửi thông báo lỗi dưới dạng JSON
+	        response.setContentType("application/json");
+	        response.setCharacterEncoding("UTF-8");
+	        response.getWriter().write("{\"error\": \"Class not found\"}");
+	    } else {
+	        // Gửi dữ liệu lớp học dưới dạng JSON
+	        response.setContentType("application/json");
+	        response.setCharacterEncoding("UTF-8");
+
+	        // Chuyển đối tượng Classes thành JSON (Bạn có thể sử dụng thư viện như Gson hoặc Jackson)
+	        String json = new Gson().toJson(classes);
+	        response.getWriter().write(json);
+	    }
+	}
+
+
 
 	private void searchClasses(HttpServletRequest request, HttpServletResponse response)
 	        throws SQLException, IOException, ServletException {

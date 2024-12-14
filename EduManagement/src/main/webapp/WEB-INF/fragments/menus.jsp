@@ -182,6 +182,12 @@ request.setAttribute("notifications", notifications);
                         <p>Banner</p>
                     </a>
                 </li>
+                 <li class="nav-item">
+                    <a href="<%=request.getContextPath()%>/CommentsController?action=/listComments" class="nav-link">
+                        <i class="nav-icon fas fa-image"></i>
+                        <p>Comments</p>
+                    </a>
+                </li>
             </ul>
         </nav>
         <!-- /.sidebar-menu -->

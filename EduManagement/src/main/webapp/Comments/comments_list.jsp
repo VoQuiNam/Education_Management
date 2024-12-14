@@ -7,31 +7,33 @@
 <c:import url="/WEB-INF/fragments/header.jsp" />
 <meta http-equiv="Content-Language" content="vi" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
 <link rel="stylesheet"
 	href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <script
 	src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
 <style>
+/* Tùy chỉnh CSS */
 .action-buttons {
 	white-space: nowrap;
+}
+
+.action-buttons a {
+	margin-right: 5px;
 }
 </style>
 <script src="<c:url value='/js/delete_waring.js'/>"></script>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
-	<c:if test="${not empty sessionScope.errorMessage}">
-    <script>
-        Swal.fire({
-            icon: 'error',
-            title: 'Error!',
-            text: '${sessionScope.errorMessage}'
-        });
-    </script>
-    <!-- Clear the error message from the session -->
-    <c:remove var="errorMessage" scope="session" />
-</c:if>
-
-
+	<c:if test="${not empty errorMessage}">
+		<script>
+			Swal.fire({
+				icon : 'error',
+				title : 'Error!',
+				text : '${errorMessage}'
+			});
+		</script>
+	</c:if>
 	<div class="wrapper">
 		<c:import url="/WEB-INF/fragments/menus.jsp" />
 		<div class="content-wrapper" id="main-content">
@@ -41,47 +43,36 @@
 						<div class="col-12">
 							<div class="card">
 								<div class="card-header">
-									<h1>Account List</h1>
-									<a
-										href="<%=request.getContextPath()%>/UserController?action=/new"
-										class="btn btn-primary">Add</a>
+									<h1>Comments List</h1>
 								</div>
 								<div class="card-body">
 									<c:choose>
-										<c:when test="${empty listUser}">
+										
+										<c:when test="${empty listComments}">
 											<div class="alert alert-warning" role="alert">No
-												accounts available.</div>
+												comments available.</div>
 										</c:when>
+										
 										<c:otherwise>
 											<table id="example1"
 												class="table table-bordered table-striped">
 												<thead>
 													<tr>
-														<th>Avatar</th>
-														<th>First Name</th>
-														<th>Last Name</th>
-														<th>Year of Birth</th>
-														<th>Gender</th>
-														<th>Address</th>
-														<th>Type</th>
-														<th>Action</th>
+														<th>User id</th>
+														<th>Content</th>
+														<th>Create at</th>
+														<th>Class id</th>
 													</tr>
 												</thead>
 												<tbody>
-													<c:forEach var="user" items="${listUser}">
+													<c:forEach var="comments" items="${listComments}">
 														<tr>
-															<td><img src="${user.image}"
-																	alt="User Image" style="width: 100px; height: auto;" /></td>
-															<td><c:out value="${user.firstName}" /></td>
-															<td><c:out value="${user.lastName}" /></td>
-															<td><c:out value="${user.dob}" /></td>
-															<td><c:out value="${user.gender}" /></td>
-															<td><c:out value="${user.address}" /></td>
-															<td><c:out value="${user.type}" /></td>
-															<td class="action-buttons"><a
-																href="<%=request.getContextPath()%>/UserController?action=/edit&id=${user.id}"
-																class="btn btn-warning">Edit</a> <a
-																href="<%=request.getContextPath()%>/UserController?action=/delete&id=${user.id}"
+															<td><c:out value="${comments.user_id}" /></td>
+															<td><c:out value="${comments.content}" /></td>
+															<td><c:out value="${comments.created_at}" /></td>
+															<td><c:out value="${comments.class_id}" /></td>
+															<td class="action-buttons"> <a
+																href="<%=request.getContextPath()%>/ClassesController?action=/deleteCl&id=${classes.id}"
 																class="btn btn-danger delete-button">Delete</a></td>
 														</tr>
 													</c:forEach>
@@ -90,7 +81,6 @@
 										</c:otherwise>
 									</c:choose>
 								</div>
-
 							</div>
 						</div>
 					</div>
@@ -100,10 +90,5 @@
 		<c:import url="/WEB-INF/fragments/footer.jsp" />
 	</div>
 	<c:import url="/WEB-INF/fragments/addition.jsp" />
-	<script
-		src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
-	<script>
-		
-	</script>
 </body>
 </html>

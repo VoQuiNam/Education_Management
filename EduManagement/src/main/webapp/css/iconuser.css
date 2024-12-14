@@ -64,3 +64,16 @@
 .header-action-btn:focus {
     color: var(--kappel); /* Change color on hover and focus */
 }
+
+.comment-icon {
+    position: absolute; /* Định vị so với .tutor-class-item */
+    top: 10px; /* Căn cách biên trên 10px */
+    right: 10px; /* Căn cách biên phải 10px */
+    border-radius: 50%; /* Làm tròn nền */
+    padding: 5px; /* Khoảng cách bên trong nền */
+    cursor: pointer; /* Hiển thị con trỏ khi hover */
+}
+
+.icon_comment{
+	font-size: 2.2rem;
+}

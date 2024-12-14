@@ -23,6 +23,9 @@
   -->
 <link rel="stylesheet" href="<c:url value='/css/style.css'/>">
 <link rel="stylesheet" href="<c:url value='/css/iconuser.css'/>">
+<script src="<c:url value='/js/adminssionClass.js'/>"></script>
+
+<%-- <link rel="stylesheet" href="<c:url value='/css/bootstrap/css/bootstrap.css'/>"> --%>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -97,15 +100,15 @@
 
 
 	<div class="tutor-classes-container">
-			<div class="filter-container">
-				<i class="fas fa-filter filter-icon" id="filter-icon"></i>
-				<div class="filter-dropdown" id="filter-dropdown">
-					<a href="#" data-status="All" class="filter-option">All</a> <a
-						href="#" data-status="New" class="filter-option">New</a> <a
-						href="#" data-status="Teaching" class="filter-option">Teaching</a>
-					<a href="#" data-status="Success" class="filter-option">Success</a>
-				</div>
+		<div class="filter-container">
+			<i class="fas fa-filter filter-icon" id="filter-icon"></i>
+			<div class="filter-dropdown" id="filter-dropdown">
+				<a href="#" data-status="All" class="filter-option">All</a> <a
+					href="#" data-status="New" class="filter-option">New</a> <a
+					href="#" data-status="Teaching" class="filter-option">Teaching</a>
+				<a href="#" data-status="Success" class="filter-option">Success</a>
 			</div>
+		</div>
 
 		<a type="button" class="create-btn"
 			href="<%=request.getContextPath()%>/AdminssionClassController?action=/newClass"
@@ -177,7 +180,13 @@
 								data-class-id="${classes.id}"
 								<c:if test="${classes.status eq 'Success'}">disabled</c:if>>Cancel
 								Class</button>
-						</form>
+						</form> <!-- Add Comment Icon -->
+						<a href="<%=request.getContextPath()%>/CommentAdminssionController?action=/getClassDetails&class_id=${classes.id}">
+							<div class="comment-icon" style="float: right; margin-left: 10px;">
+								<i class="fas fa-comment icon_comment"></i>
+							</div>
+						</a>
+						
 					</li>
 				</c:if>
 			</c:forEach>
@@ -188,7 +197,6 @@
 			<p class="no-data-message">No data found</p>
 		</c:if>
 	</div>
-
 
 	<script>
 	document.addEventListener('DOMContentLoaded', function () {
@@ -214,139 +222,52 @@
 	    </c:if>
 	});
 
-	//Đính kèm lại trình xử lý sự kiện: Bạn cần đính kèm lại trình xử 
-	//lý sự kiện cho nút "Xác nhận" và "Hủy" mỗi khi danh sách lớp được cập nhật. 
-	//Bạn có thể đạt được điều này bằng cách di chuyển logic đính kèm của 
-	//trình nghe sự kiện vào một hàm riêng biệt và gọi nó sau khi danh sách lớp được cập nhật.(nếu ko đính kèm thì sự kiện lắng nghe sẽ bị xóa)
-	function attachEventListeners() {
-	    document.querySelectorAll('.cancel-btn').forEach(function (button) {
-	        button.addEventListener('click', function (event) {
-	            event.preventDefault();
-	            const classId = this.getAttribute('data-class-id');
-	            Swal.fire({
-	                title: 'Are you sure you want to cancel?',
-	                text: "You will not be able to undo this action!",
-	                icon: 'warning',
-	                showCancelButton: true,
-	                confirmButtonColor: '#3085d6',
-	                cancelButtonColor: '#d33',
-	                confirmButtonText: 'Yes',
-	                cancelButtonText: 'Cancel'
-	            }).then((result) => {
-	                if (result.isConfirmed) {
-	                    // Submit the form
-	                    this.closest('form').submit();
-	                }
-	            });
-	        });
-	    });
+	document.addEventListener('DOMContentLoaded', function() {
+		const filterIcon = document.getElementById('filter-icon');
+		const filterDropdown = document.getElementById('filter-dropdown');
+		const filterOptions = document.querySelectorAll('.filter-option');
 
-	    document.querySelectorAll('.confirm').forEach(function (button) {
-	        button.addEventListener('click', function (event) {
-	            event.preventDefault();
-	            const classId = this.getAttribute('data-class-id');
-	            Swal.fire({
-	                title: 'Are you sure you want to confirm teaching this class?',
-	                text: "This will send a request for approval.",
-	                icon: 'warning',
-	                showCancelButton: true,
-	                confirmButtonColor: '#3085d6',
-	                cancelButtonColor: '#d33',
-	                confirmButtonText: 'Yes, confirm',
-	                cancelButtonText: 'Cancel'
-	            }).then((result) => {
-	                if (result.isConfirmed) {
-	                    fetch('<%=request.getContextPath()%>/AdminssionClassController', {
-	                        method: 'POST',
-	                        headers: {
-	                            'Content-Type': 'application/x-www-form-urlencoded',
-	                        },
-	                        body: new URLSearchParams({
-	                            action: 'confirmTeach',
-	                            id: classId
-	                        })
-	                    })
-	                    .then(response => response.text().then(text => ({ status: response.status, text })))
-	                    .then(({ status, text }) => {
-	                        if (status === 200 && text === 'Notification sent') {
-	                            Swal.fire(
-	                                'Sent!',
-	                                'Notification has been sent to the admin.',
-	                                'success'
-	                            ).then(() => {
-	                                window.location.reload(); // Reload the page after confirmation
-	                            });
-	                        } else {
-	                            let errorMessage = 'There was a problem sending the notification.';
-	                            if (status === 400) {
-	                                errorMessage = 'Requires registered students.';
-	                            } else if (status === 403) {
-	                                errorMessage = 'Only the creator of the class can confirm it.';
-	                            }
-	                            Swal.fire(
-	                                'Error!',
-	                                errorMessage,
-	                                'error'
-	                            );
-	                        }
-	                    })
-	                    .catch(error => {
-	                        console.error('Error:', error);
-	                        Swal.fire(
-	                            'Error!',
-	                            'There was a problem sending the notification.',
-	                            'error'
-	                        );
-	                    });
-	                }
-	            });
-	        });
-	    });
-	}
+		// Toggle the filter dropdown
+		filterIcon.addEventListener('click', function() {
+			filterDropdown.style.display = filterDropdown.style.display === 'block' ? 'none' : 'block';
+		});
 
-	document.addEventListener('DOMContentLoaded', function () {
-	    const filterIcon = document.getElementById('filter-icon');
-	    const filterDropdown = document.getElementById('filter-dropdown');
-	    const filterOptions = document.querySelectorAll('.filter-option');
+		// Apply filter when an option is selected
+		filterOptions.forEach(option => {
+			option.addEventListener('click', function(event) {
+				event.preventDefault();
+				const status = this.getAttribute('data-status');
 
-	    // Toggle the filter dropdown
-	    filterIcon.addEventListener('click', function () {
-	        filterDropdown.style.display = filterDropdown.style.display === 'block' ? 'none' : 'block';
-	    });
+				// Update the page with the selected status
+				updateClasses(status);
 
-	    // Apply filter when an option is selected
-	    filterOptions.forEach(option => {
-	        option.addEventListener('click', function (event) {
-	            event.preventDefault();
-	            const status = this.getAttribute('data-status');
+				// Close the dropdown
+				filterDropdown.style.display = 'none';
+			});
+		});
 
-	            // Update the page with the selected status
-	            updateClasses(status);
+		function updateClasses(status) {
+			fetch('<%=request.getContextPath()%>/AdminssionClassController?action=filterClasses&status=' + encodeURIComponent(status))
+				.then(response => response.text())
+				.then(data => {
+					// Update only the class list part of the page
+					const parser = new DOMParser();
+					const htmlDoc = parser.parseFromString(data, 'text/html');
+					const newClassList = htmlDoc.querySelector('.tutor-classes-list');
+					document.querySelector('.tutor-classes-list').innerHTML = newClassList.innerHTML;
 
-	            // Close the dropdown
-	            filterDropdown.style.display = 'none';
-	        });
-	    });
+					// Re-attach event listeners to the new elements
+					attachEventListeners();
+				})
+				.catch(error => console.error('Error:', error));
+		}
 
-	    function updateClasses(status) {
-	        fetch('<%=request.getContextPath()%>/AdminssionClassController?action=filterClasses&status=' + encodeURIComponent(status))
-	            .then(response => response.text())
-	            .then(data => {
-	                // Update only the class list part of the page
-	                const parser = new DOMParser();
-	                const htmlDoc = parser.parseFromString(data, 'text/html');
-	                const newClassList = htmlDoc.querySelector('.tutor-classes-list');
-	                document.querySelector('.tutor-classes-list').innerHTML = newClassList.innerHTML;
-
-	                // Re-attach event listeners to the new elements
-	                attachEventListeners();
-	            })
-	            .catch(error => console.error('Error:', error));
-	    }
 	});
 
-    </script>
 
+
+
+    </script>
 	<c:import url="/WEB-INF/fragments/footerclient.jsp" />
 
 	<!-- 

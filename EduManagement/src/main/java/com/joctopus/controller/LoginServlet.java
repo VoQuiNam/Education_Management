@@ -12,19 +12,23 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 
+import com.joctopus.dao.ClassesDao;
 import com.joctopus.dao.ClassesDaoImpl;
 import com.joctopus.dao.UserDao;
 import com.joctopus.dao.UserDaoImpl;
+import com.joctopus.model.Classes;
 import com.joctopus.model.User;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private UserDao userDao;
+	private ClassesDao classesDao;
 
 
 	public void init() {
 		this.userDao = new UserDaoImpl();
+		this.classesDao = new ClassesDaoImpl();
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -44,17 +48,14 @@ public class LoginServlet extends HttpServlet {
 	            session.setAttribute("user_id", user.getId());
 	            session.setAttribute("firstName", user.getFirstName());
 	            session.setAttribute("lastName", user.getLastName());
-				/*
-				 * session.setAttribute("phone_number", user.getPhoneNumber());
-				 * session.setAttribute("gender", user.getGender()); session.setAttribute("DOB",
-				 * user.getDob()); session.setAttribute("address", user.getAddress());
-				 */
 	            session.setAttribute("type", user.getType());
 	            session.setAttribute("loggedInUser", user);
+	            
+
 	            if (user.getType().equals("Admin")) {
 	                response.sendRedirect(contextPath + "/Home/index.jsp");
 	            } else {
-	                response.sendRedirect(contextPath + "/HomeClient/index.jsp");
+	                response.sendRedirect(contextPath + "/HomeClientController?action=/listBanners");
 	            }
 	        } else {
 	            request.setAttribute("errorMessage", "Invalid username or password");
@@ -64,11 +65,7 @@ public class LoginServlet extends HttpServlet {
 	    } catch (SQLException e) {
 	        throw new ServletException("Database error occurred", e);
 	    }
-	}
+	}       
 
-        
-       
-
-        
 }
 

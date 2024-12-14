@@ -56,34 +56,34 @@
 
 <style>
 .filter-container {
-    position: relative;
+	position: relative;
 }
 
 .filter-dropdown {
-    display: none;
-    position: absolute;
-    top: 40px;
-    right: 0;
-    background-color: white;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    z-index: 1000;
+	display: none;
+	position: absolute;
+	top: 40px;
+	right: 0;
+	background-color: white;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+	z-index: 1000;
 }
 
 .filter-dropdown .filter-option {
-    padding: 10px;
-    display: block;
-    color: black;
-    text-decoration: none;
+	padding: 10px;
+	display: block;
+	color: black;
+	text-decoration: none;
 }
 
 .filter-dropdown .filter-option:hover {
-    background-color: #f1f1f1;
+	background-color: #f1f1f1;
 }
 
 .filter-icon {
-    cursor: pointer;
+	cursor: pointer;
 }
 </style>
 
@@ -101,7 +101,10 @@
 					href="#" data-status="Teaching" class="filter-option">Teaching</a>
 				<a href="#" data-status="Success" class="filter-option">Success</a>
 			</div>
+
+
 		</div>
+
 
 
 		<a type="button" class="create-btn"
@@ -109,43 +112,65 @@
 			style="margin-top: 73px;">Create Class</a>
 
 		<ul class="tutor-classes-list">
-    <c:forEach var="classes" items="${listClass}">
-        <c:if test="${classes.requeststatus ne 'Unapproved'}">
-            <li class="tutor-class-item">
-                <h2>Class Name: ${classes.class_name}</h2>
-                <p><strong>Class:</strong> ${classes.eduClass}</p>
-                <p><strong>Study Time:</strong> ${classes.study_time}</p>
-                <p><strong>Subjects:</strong> ${classes.subject}</p>
-                <p><strong>Location:</strong> ${classes.address}</p>
-                <p><strong>Session:</strong> ${classes.session}</p>
-                <p><strong>Status:</strong> ${classes.status}</p>
-                <c:choose>
-                    <c:when test="${classes.users.type eq 'Tutors'}">
-                        <p><strong>Number of students:</strong> ${classes.numberOfStudents}</p>
-                    </c:when>
-                </c:choose>
-                <form action="<%=request.getContextPath()%>/AdminssionClassController" method="post" style="display: inline-block;">
-                    <input type="hidden" name="id" value="${classes.id}">
-                    <c:choose>
-                        <c:when test="${classes.users.type eq 'Tutors'}">
-                            <input type="hidden" name="action" value="confirmTeach">
-                            <button type="submit" class="register-btn confirm" data-class-id="${classes.id}">Confirm Class</button>
-                        </c:when>
-                        <c:otherwise>
-                            <input type="hidden" name="action" value="registerClass">
-                            <button type="submit" class="register-btn register">Register Class</button>
-                        </c:otherwise>
-                    </c:choose>
-                </form>
-                <form action="<%=request.getContextPath()%>/AdminssionClassController" method="post" style="display: inline-block;">
-                    <input type="hidden" name="id" value="${classes.id}">
-                    <input type="hidden" name="action" value="cancelClass">
-                    <button type="submit" class="cancel-btn" data-class-id="${classes.id}">Cancel Class</button>
-                </form>
-            </li>
-        </c:if>
-    </c:forEach>
-</ul>
+			<c:forEach var="classes" items="${listClass}">
+				<c:if test="${classes.requeststatus ne 'Unapproved'}">
+					<li class="tutor-class-item">
+						<h2>Class Name: ${classes.class_name}</h2>
+						<p>
+							<strong>Class:</strong> ${classes.eduClass}
+						</p>
+						<p>
+							<strong>Study Time:</strong> ${classes.study_time}
+						</p>
+						<p>
+							<strong>Subjects:</strong> ${classes.subject}
+						</p>
+						<p>
+							<strong>Location:</strong> ${classes.address}
+						</p>
+						<p>
+							<strong>Session:</strong> ${classes.session}
+						</p>
+						<p>
+							<strong>Status:</strong> ${classes.status}
+						</p> <c:choose>
+							<c:when test="${classes.users.type eq 'Tutors'}">
+								<p>
+									<strong>Number of students:</strong>
+									${classes.numberOfStudents}
+								</p>
+							</c:when>
+						</c:choose>
+						<form
+							action="<%=request.getContextPath()%>/AdminssionClassController"
+							method="post" style="display: inline-block;">
+							<input type="hidden" name="id" value="${classes.id}">
+							<c:choose>
+								<c:when test="${classes.users.type eq 'Tutors'}">
+									<input type="hidden" name="action" value="confirmTeach">
+									<button type="submit" class="register-btn confirm"
+										data-class-id="${classes.id}">Confirm Class</button>
+								</c:when>
+								<c:otherwise>
+									<input type="hidden" name="action" value="registerClass">
+									<button type="submit" class="register-btn register">Register
+										Class</button>
+								</c:otherwise>
+							</c:choose>
+						</form>
+						<form
+							action="<%=request.getContextPath()%>/AdminssionClassController"
+							method="post" style="display: inline-block;">
+							<input type="hidden" name="id" value="${classes.id}"> <input
+								type="hidden" name="action" value="cancelClass">
+							<button type="submit" class="cancel-btn"
+								data-class-id="${classes.id}">Cancel Class</button>
+						</form>
+
+					</li>
+				</c:if>
+			</c:forEach>
+		</ul>
 	</div>
 
 	<script>

@@ -61,75 +61,144 @@ String type = (String) session.getAttribute("type");
 			<!-- 
         - #HERO
       -->
+			<c:set var="displayedBanner" value="false" />
+			<c:forEach var="banner" items="${listBanner}">
+				<c:if
+					test="${banner.position == 'banner_slide' && banner.isActive == true && displayedBanner == false}">
+					<section class="section hero has-bg-image" id="home"
+						aria-label="home"
+						style="background-image: url('<c:url value="${banner.imageUrl}" />')">
+						<div class="container">
 
-			<section class="section hero has-bg-image" id="home"
-				aria-label="home"
-				style="background-image: url('<c:url value='/images/hero-bg.svg'/>')">
-				<div class="container">
+							<div class="hero-content">
 
-					<div class="hero-content">
+								<h1 class="h1 section-title">
+									<c:out value="${banner.title}" />
+								</h1>
 
-						<h1 class="h1 section-title">
-							The Best Program to <span class="span">Enroll</span> for Exchange
-						</h1>
+								<p class="hero-text"><c:out value="${banner.description}" /></p>
 
-						<p class="hero-text">Excepteur sint occaecat cupidatat non
-							proident sunt in culpa qui officia deserunt mollit.</p>
 
-					
 
-						<%
-						if (type != null) {
+								<%
+								if (type != null) {
+									if (type.equals("Parents")) {
+								%>
+								<a
+									href="<%=request.getContextPath()%>/FindTutorClassController?action=/listClassParent"
+									class="btn has-before"> <span class="span">Find
+										courses</span> <ion-icon name="arrow-forward-outline"
+										aria-hidden="true"></ion-icon>
+								</a>
+								<%
+								} else if (type.equals("Tutors")) {
+								%>
+
+
+								<a
+									href="<%=request.getContextPath()%>/AdminssionClassController?action=/listClass"
+									class="btn has-before"> <span class="span">Find
+										courses</span> <ion-icon name="arrow-forward-outline"
+										aria-hidden="true"></ion-icon>
+								</a>
+								<%
+								}
+								}
+								%>
+
+							</div>
+
+							<figure class="hero-banner">
+
+								<div class="img-holder one" style="--width: 270; --height: 300;">
+									<img src="<c:url value='/images/hero-banner-1.jpg'/>"
+										width="270" height="300" alt="hero banner" class="img-cover">
+								</div>
+
+								<div class="img-holder two" style="--width: 240; --height: 370;">
+									<img src="<c:url value='/images/hero-banner-2.jpg'/>"
+										width="240" height="370" alt="hero banner" class="img-cover">
+								</div>
+
+								<img src="<c:url value='/images/hero-shape-1.svg'/>" width="380"
+									height="190" alt="" class="shape hero-shape-1">
+
+								<img src="<c:url value='/images/hero-shape-2.png'/>" width="622"
+									height="551" alt="" class="shape hero-shape-2">
+
+							</figure>
+
+						</div>
+					</section>
+					<!-- Đặt giá trị của displayedBanner thành true -->
+					<c:set var="displayedBanner" value="true" />
+				</c:if>
+
+
+			</c:forEach>
+			<!-- Hiển thị ảnh mặc định nếu không có banner nào thỏa điều kiện -->
+			<c:if test="${!displayedBanner}">
+				<section class="section hero has-bg-image" id="home"
+					aria-label="home"
+					style="background-image: url('<c:url value='/images/hero-bg.svg'/>')">
+					<div class="container">
+						<div class="hero-content">
+							<h1 class="h1 section-title">
+								The Best Program to <span class="span">Enroll</span> for
+								Exchange
+							</h1>
+							<p class="hero-text">Excepteur sint occaecat cupidatat non
+								proident sunt in culpa qui officia deserunt mollit.</p>
+							<%
+							if (type != null) {
+							%>
+							<%
 							if (type.equals("Parents")) {
-						%>
-						<a
-							href="<%=request.getContextPath()%>/FindTutorClassController?action=/listClassParent"
-							class="btn has-before"> <span class="span">Find
-								courses</span> <ion-icon name="arrow-forward-outline"
-								aria-hidden="true"></ion-icon>
-						</a>
-						<%
-						} else if (type.equals("Tutors")) {
-						%>
+							%>
+							<a
+								href="<%=request.getContextPath()%>/FindTutorClassController?action=/listClassParent"
+								class="btn has-before"> <span class="span">Find
+									courses</span> <ion-icon name="arrow-forward-outline"
+									aria-hidden="true"></ion-icon>
+							</a>
+							<%
+							} else if (type.equals("Tutors")) {
+							%>
+							<a
+								href="<%=request.getContextPath()%>/AdminssionClassController?action=/listClass"
+								class="btn has-before"> <span class="span">Find
+									courses</span> <ion-icon name="arrow-forward-outline"
+									aria-hidden="true"></ion-icon>
+							</a>
+							<%
+							}
+							%>
+							<%
+							}
+							%>
+						</div>
+						<figure class="hero-banner">
 
+								<div class="img-holder one" style="--width: 270; --height: 300;">
+									<img src="<c:url value='/images/hero-banner-1.jpg'/>"
+										width="270" height="300" alt="hero banner" class="img-cover">
+								</div>
 
-						<a
-							href="<%=request.getContextPath()%>/AdminssionClassController?action=/listClass"
-							class="btn has-before"> <span class="span">Find
-								courses</span> <ion-icon name="arrow-forward-outline"
-								aria-hidden="true"></ion-icon>
-						</a>
-						<%
-						}
-						}
-						%>
+								<div class="img-holder two" style="--width: 240; --height: 370;">
+									<img src="<c:url value='/images/hero-banner-2.jpg'/>"
+										width="240" height="370" alt="hero banner" class="img-cover">
+								</div>
 
+								<img src="<c:url value='/images/hero-shape-1.svg'/>" width="380"
+									height="190" alt="" class="shape hero-shape-1">
+
+								<img src="<c:url value='/images/hero-shape-2.png'/>" width="622"
+									height="551" alt="" class="shape hero-shape-2">
+
+							</figure>
 					</div>
-
-					<figure class="hero-banner">
-
-						<div class="img-holder one" style="--width: 270; --height: 300;">
-							<img src="<c:url value='/images/hero-banner-1.jpg'/>" width="270"
-								height="300" alt="hero banner" class="img-cover">
-						</div>
-
-						<div class="img-holder two" style="--width: 240; --height: 370;">
-							<img src="<c:url value='/images/hero-banner-2.jpg'/>" width="240"
-								height="370" alt="hero banner" class="img-cover">
-						</div>
-
-						<img src="<c:url value='/images/hero-shape-1.svg'/>" width="380"
-							height="190" alt="" class="shape hero-shape-1">
-
-						<img src="<c:url value='/images/hero-shape-2.png'/>" width="622"
-							height="551" alt="" class="shape hero-shape-2">
-
-					</figure>
-
-				</div>
-			</section>
-
-
+				</section>
+			</c:if>
 
 
 
@@ -301,241 +370,6 @@ String type = (String) session.getAttribute("type");
 
 				</div>
 			</section>
-
-			<!-- 
-        - #VIDEO
-      -->
-
-		<%-- 	<section class="video has-bg-image" aria-label="video"
-				style="background-image: url('<c:url value='/images/video-bg.png'/>')">
-				<div class="container">
-
-					<div class="video-card">
-
-						<div class="video-banner img-holder has-after"
-							style="--width:; --height:;">
-							<img src="<c:url value='/images/video-banner.jpg'/>" width="970"
-								height="550" loading="lazy" alt="video banner" class="img-cover">
-
-							<button class="play-btn" aria-label="play video">
-								<ion-icon name="play" aria-hidden="true"></ion-icon>
-							</button>
-						</div>
-
-						<img src="<c:url value='/images/video-shape-1.png'/>" width="1089"
-							height="605" loading="lazy" alt="" class="shape video-shape-1">
-
-						<img src="<c:url value='/images/video-shape-2.png'/>" width="158"
-							height="174" loading="lazy" alt="" class="shape video-shape-2">
-
-					</div>
-
-				</div>
-			</section> --%>
-
-
-
-
-
-			<!-- 
-        - #STATE
-      -->
-<!-- 
-			<section class="section stats" aria-label="stats">
-				<div class="container">
-
-					<ul class="grid-list">
-
-						<li>
-							<div class="stats-card" style="--color: 170, 75%, 41%">
-								<h3 class="card-title">29.3k</h3>
-
-								<p class="card-text">Student Enrolled</p>
-							</div>
-						</li>
-
-						<li>
-							<div class="stats-card" style="--color: 351, 83%, 61%">
-								<h3 class="card-title">32.4K</h3>
-
-								<p class="card-text">Class Completed</p>
-							</div>
-						</li>
-
-						<li>
-							<div class="stats-card" style="--color: 260, 100%, 67%">
-								<h3 class="card-title">100%</h3>
-
-								<p class="card-text">Satisfaction Rate</p>
-							</div>
-						</li>
-
-						<li>
-							<div class="stats-card" style="--color: 42, 94%, 55%">
-								<h3 class="card-title">354+</h3>
-
-								<p class="card-text">Top Instructors</p>
-							</div>
-						</li>
-
-					</ul>
-
-				</div>
-			</section>
-
-
-
- -->
-
-			<!-- 
-        - #BLOG
-      -->
-
-			<%-- <section class="section blog has-bg-image" id="blog"
-				aria-label="blog"
-				style="background-image: url('<c:url value='/images/blog-bg.svg'/>')">
-				<div class="container">
-
-					<p class="section-subtitle">Latest Articles</p>
-
-					<h2 class="h2 section-title">Get News With Eduweb</h2>
-
-					<ul class="grid-list">
-
-						<li>
-							<div class="blog-card">
-
-								<figure class="card-banner img-holder has-after"
-									style="--width: 370; --height: 370;">
-									<img src="<c:url value='/images/blog-1.jpg'/>" width="370"
-										height="370" loading="lazy"
-										alt="Become A Better Blogger: Content Planning"
-										class="img-cover">
-								</figure>
-
-								<div class="card-content">
-
-									<a href="#" class="card-btn" aria-label="read more"> <ion-icon
-											name="arrow-forward-outline" aria-hidden="true"></ion-icon>
-									</a> <a href="#" class="card-subtitle">Online</a>
-
-									<h3 class="h3">
-										<a href="#" class="card-title">Become A Better Blogger:
-											Content Planning</a>
-									</h3>
-
-									<ul class="card-meta-list">
-
-										<li class="card-meta-item"><ion-icon
-												name="calendar-outline" aria-hidden="true"></ion-icon> <span
-											class="span">Oct 10, 2021</span></li>
-
-										<li class="card-meta-item"><ion-icon
-												name="chatbubbles-outline" aria-hidden="true"></ion-icon> <span
-											class="span">Com 09</span></li>
-
-									</ul>
-
-									<p class="card-text">Lorem Ipsum Dolor Sit Amet Cons Tetur
-										Adipisicing Sed.</p>
-
-								</div>
-
-							</div>
-						</li>
-
-						<li>
-							<div class="blog-card">
-
-								<figure class="card-banner img-holder has-after"
-									style="--width: 370; --height: 370;">
-									<img src="<c:url value='/images/blog-2.jpg'/>" width="370"
-										height="370" loading="lazy"
-										alt="Become A Better Blogger: Content Planning"
-										class="img-cover">
-								</figure>
-
-								<div class="card-content">
-
-									<a href="#" class="card-btn" aria-label="read more"> <ion-icon
-											name="arrow-forward-outline" aria-hidden="true"></ion-icon>
-									</a> <a href="#" class="card-subtitle">Online</a>
-
-									<h3 class="h3">
-										<a href="#" class="card-title">Become A Better Blogger:
-											Content Planning</a>
-									</h3>
-
-									<ul class="card-meta-list">
-
-										<li class="card-meta-item"><ion-icon
-												name="calendar-outline" aria-hidden="true"></ion-icon> <span
-											class="span">Oct 10, 2021</span></li>
-
-										<li class="card-meta-item"><ion-icon
-												name="chatbubbles-outline" aria-hidden="true"></ion-icon> <span
-											class="span">Com 09</span></li>
-
-									</ul>
-
-									<p class="card-text">Lorem Ipsum Dolor Sit Amet Cons Tetur
-										Adipisicing Sed.</p>
-
-								</div>
-
-							</div>
-						</li>
-
-						<li>
-							<div class="blog-card">
-
-								<figure class="card-banner img-holder has-after"
-									style="--width: 370; --height: 370;">
-									<img src="<c:url value='/images/blog-3.jpg'/>" width="370"
-										height="370" loading="lazy"
-										alt="Become A Better Blogger: Content Planning"
-										class="img-cover">
-								</figure>
-
-								<div class="card-content">
-
-									<a href="#" class="card-btn" aria-label="read more"> <ion-icon
-											name="arrow-forward-outline" aria-hidden="true"></ion-icon>
-									</a> <a href="#" class="card-subtitle">Online</a>
-
-									<h3 class="h3">
-										<a href="#" class="card-title">Become A Better Blogger:
-											Content Planning</a>
-									</h3>
-
-									<ul class="card-meta-list">
-
-										<li class="card-meta-item"><ion-icon
-												name="calendar-outline" aria-hidden="true"></ion-icon> <span
-											class="span">Oct 10, 2021</span></li>
-
-										<li class="card-meta-item"><ion-icon
-												name="chatbubbles-outline" aria-hidden="true"></ion-icon> <span
-											class="span">Com 09</span></li>
-
-									</ul>
-
-									<p class="card-text">Lorem Ipsum Dolor Sit Amet Cons Tetur
-										Adipisicing Sed.</p>
-
-								</div>
-
-							</div>
-						</li>
-
-					</ul>
-
-					<img src="<c:url value='/images/blog-shape.png'/>" width="186"
-						height="186" loading="lazy" alt="" class="shape blog-shape">
-
-				</div>
-			</section> --%>
-
 		</article>
 	</main>
 

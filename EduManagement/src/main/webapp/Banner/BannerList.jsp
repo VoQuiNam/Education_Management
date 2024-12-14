@@ -57,82 +57,87 @@
 										</c:when>
 
 										<c:otherwise>
+											<!-- Table for 'banner_slide' -->
 											<table id="table1" class="table table-bordered table-striped">
 												<thead>
 													<tr>
+														<th>#</th>
 														<th>Title</th>
 														<th>Description</th>
 														<th>Image Url</th>
-														<th>Start Date</th>
-														<th>End Date</th>
 														<th>Is Active</th>
 														<th>Position</th>
-														<th>Order</th>
 													</tr>
 												</thead>
 												<tbody>
 													<!-- Filter banners with position 'banner_slide' -->
+													<c:set var="counter1" value="1" />
+													<!-- Initialize counter for table1 -->
 													<c:forEach var="banners" items="${listBanner}">
 														<c:if test="${banners.position == 'banner_slide'}">
 															<tr>
+																<td><c:out value="${counter1}" /></td>
+																<!-- Display counter -->
 																<td><c:out value="${banners.title}" /></td>
 																<td><c:out value="${banners.description}" /></td>
 																<td><img src="${banners.imageUrl}"
 																	alt="Banner Image" style="width: 100px; height: auto;" /></td>
-																<td><c:out value="${banners.startDate}" /></td>
-																<td><c:out value="${banners.endDate}" /></td>
 																<td><c:out value="${banners.isActive}" /></td>
 																<td><c:out value="${banners.position}" /></td>
-																<td><c:out value="${banners.orderIndex}" /></td>
 																<td class="action-buttons"><a
 																	href="<%=request.getContextPath()%>/BannerController?action=/editBanner&BannerID=${banners.bannerID}"
 																	class="btn btn-warning">Edit</a> <a
 																	href="<%=request.getContextPath()%>/BannerController?action=/deleteBanner&BannerID=${banners.bannerID}"
 																	class="btn btn-danger delete-button">Delete</a></td>
 															</tr>
+															<c:set var="counter1" value="${counter1 + 1}" />
+															<!-- Increment counter -->
 														</c:if>
 													</c:forEach>
 												</tbody>
 											</table>
 
+											<!-- Table for 'banner_footer' -->
 											<table id="table2" class="table table-bordered table-striped"
 												style="margin-top: 30px;">
 												<thead>
 													<tr>
+														<th>#</th>
 														<th>Title</th>
 														<th>Description</th>
 														<th>Image Url</th>
-														<th>Start Date</th>
-														<th>End Date</th>
 														<th>Is Active</th>
 														<th>Position</th>
-														<th>Order</th>
 													</tr>
 												</thead>
 												<tbody>
 													<!-- Filter banners with position 'banner_footer' -->
+													<c:set var="counter2" value="1" />
+													<!-- Initialize counter for table2 -->
 													<c:forEach var="banners" items="${listBanner}">
 														<c:if test="${banners.position == 'banner_footer'}">
 															<tr>
+																<td><c:out value="${counter2}" /></td>
+																<!-- Display counter -->
 																<td><c:out value="${banners.title}" /></td>
 																<td><c:out value="${banners.description}" /></td>
 																<td><img src="${banners.imageUrl}"
 																	alt="Banner Image" style="width: 100px; height: auto;" /></td>
-																<td><c:out value="${banners.startDate}" /></td>
-																<td><c:out value="${banners.endDate}" /></td>
 																<td><c:out value="${banners.isActive}" /></td>
 																<td><c:out value="${banners.position}" /></td>
-																<td><c:out value="${banners.orderIndex}" /></td>
 																<td class="action-buttons"><a
 																	href="<%=request.getContextPath()%>/BannerController?action=/editBanner&BannerID=${banners.bannerID}"
 																	class="btn btn-warning">Edit</a> <a
 																	href="<%=request.getContextPath()%>/BannerController?action=/deleteBanner&BannerID=${banners.bannerID}"
 																	class="btn btn-danger delete-button">Delete</a></td>
 															</tr>
+															<c:set var="counter2" value="${counter2 + 1}" />
+															<!-- Increment counter -->
 														</c:if>
 													</c:forEach>
 												</tbody>
 											</table>
+
 										</c:otherwise>
 									</c:choose>
 								</div>

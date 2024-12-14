@@ -1410,7 +1410,8 @@ body {
 .tutor-class-item {
     background-color: #fff;
     border: 1px solid #ddd;
-    padding: 15px;
+    position: relative; 
+    padding: 20px;
     margin-bottom: 10px;
     border-radius: 5px;
 }

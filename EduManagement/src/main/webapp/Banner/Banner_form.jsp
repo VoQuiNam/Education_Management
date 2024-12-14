@@ -99,34 +99,24 @@
 								value="${Banner.imageUrl}">
 						</fieldset>
 
-
-						<%-- <c:if test="${not empty Banner.imageUrl}">
-							<!-- Hiển thị ảnh hiện tại nếu có -->
-							<fieldset class="form-group">
-								<label>Current Image</label><br> <img id="currentImage"
-									src="<c:out value='${Banner.imageUrl}' />" alt="Current Image"
-									style="max-width: 100%; max-height: 200px;">
-							</fieldset>
-						</c:if> --%>
-
-						<fieldset class="form-group">
+					<%-- 	<fieldset class="form-group">
 							<label>Start Date</label> <input type="date"
 								value="<c:out value='${Banner.startDate}' />"
 								class="form-control" name="StartDate">
-							<%-- <span class="text-danger">${requestScope.dob_error}</span> --%>
+							<span class="text-danger">${requestScope.dob_error}</span>
 						</fieldset>
 
 						<fieldset class="form-group">
 							<label>End Date</label> <input type="date"
 								value="<c:out value='${Banner.endDate}' />" class="form-control"
 								name="EndDate">
-							<%-- <span class="text-danger">${requestScope.dob_error}</span> --%>
-						</fieldset>
+							<span class="text-danger">${requestScope.dob_error}</span>
+						</fieldset> --%>
 
 
 						<fieldset class="form-group">
 							<label>Is Active</label> <select class="form-control"
-								name="IsActive">
+								name="IsActive" onchange="toggleOrderIndex(this)">
 								<option value="true" ${Banner.isActive ? 'selected' : ''}>Yes</option>
 								<option value="false" ${!Banner.isActive ? 'selected' : ''}>No</option>
 							</select>
@@ -143,11 +133,11 @@
 						</fieldset>
 
 
-						<fieldset class="form-group">
+						<%-- <fieldset class="form-group" id="orderIndexField" style="display: ${Banner.isActive ? 'block' : 'none'};">
 							<label>Order Index</label> <input type="number"
 								value="<c:out value='${Banner.orderIndex}' />"
 								class="form-control" name="OrderIndex" min="0">
-						</fieldset>
+						</fieldset> --%>
 
 						<button type="submit" class="btn btn-success">Save</button>
 						</form>
@@ -163,6 +153,15 @@
 								};
 								reader.readAsDataURL(event.target.files[0]);
 							}
+							
+							 function toggleOrderIndex(select) {
+							        var orderIndexField = document.getElementById('orderIndexField');
+							        if (select.value == "false") {
+							            orderIndexField.style.display = 'none';
+							        } else {
+							            orderIndexField.style.display = 'block';
+							        }
+							    }
 						</script>
 					</div>
 				</div>

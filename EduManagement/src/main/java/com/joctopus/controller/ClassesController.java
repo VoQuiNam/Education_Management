@@ -367,14 +367,6 @@ public class ClassesController extends HttpServlet {
 		dispatcher.forward(request, response);
 	}
 
-	/*
-	 * private void deleteClasses(HttpServletRequest request, HttpServletResponse
-	 * response) throws SQLException, IOException { int id =
-	 * Integer.parseInt(request.getParameter("id")); // Sử dụng long ở đây
-	 * classesDao.deleteClasses(id);
-	 * response.sendRedirect("ClassesController?action=/listCl"); }
-	 */
-
 	private void deleteClasses(HttpServletRequest request, HttpServletResponse response)
 	        throws SQLException, IOException {
 	    int id = Integer.parseInt(request.getParameter("id"));

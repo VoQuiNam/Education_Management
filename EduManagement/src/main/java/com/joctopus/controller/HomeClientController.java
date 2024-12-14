@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Comparator;
 import java.util.List;
 
 import com.joctopus.dao.BannerDao;
@@ -61,7 +62,7 @@ public class HomeClientController extends HttpServlet {
 
         // Ghi log để kiểm tra dữ liệu
         System.out.println("Result from selectAllBanners: " + listBanner);
-
+		/* listBanner.sort(Comparator.comparingInt(Banner::getOrderIndex)); */
         // Đặt danh sách banners làm thuộc tính của request
         request.setAttribute("listBanner", listBanner);
 

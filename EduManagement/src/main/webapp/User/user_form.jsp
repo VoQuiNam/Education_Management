@@ -29,12 +29,12 @@
 						<c:if test="${User != null}">
 							<form
 								action="<%=request.getContextPath()%>/UserController?action=/update"
-								method="post">
+								method="post" enctype="multipart/form-data">
 						</c:if>
 						<c:if test="${User == null}">
 							<form
 								action="<%=request.getContextPath()%>/UserController?action=/insert"
-								method="post">
+								method="post" enctype="multipart/form-data">
 						</c:if>
 
 						<caption>
@@ -54,6 +54,20 @@
 						</c:if>
 						<!-- requestScope là một đối tượng hoặc phạm vi (scope) được cung cấp bởi JSP (Java Server Pages), 
 						dùng để lưu trữ và truy xuất các thuộc tính hoặc giá trị chỉ tồn tại trong vòng đời của một request HTTP. -->
+						<fieldset class="form-group">
+							<label>Avatar</label> <input type="file" class="form-control"
+								name="image" id="imageInput" style="border: 0;"
+								onchange="previewImage(event)">
+
+							<!-- Display the current image -->
+							<br> <img id="currentImage"
+								src="${User.image}" alt=""
+								style="max-width: 100%; max-height: 200px;">
+
+							<!-- Hidden field to store the current image URL -->
+							<input type="hidden" name="currentImage"
+								value="${Banner.imageUrl}">
+						</fieldset>
 						<fieldset class="form-group">
 							<label>First name</label> <input type="text"
 								value="<c:out value='${requestScope.first_name != null ? requestScope.first_name : User.firstName}' />"
@@ -133,6 +147,28 @@
 
 						<button type="submit" class="btn btn-success">Save</button>
 						</form>
+						
+						<script>
+							// JavaScript function to preview the selected image
+							function previewImage(event) {
+								const reader = new FileReader();
+								reader.onload = function() {
+									const output = document
+											.getElementById('currentImage');
+									output.src = reader.result;
+								};
+								reader.readAsDataURL(event.target.files[0]);
+							}
+							
+							 function toggleOrderIndex(select) {
+							        var orderIndexField = document.getElementById('orderIndexField');
+							        if (select.value == "false") {
+							            orderIndexField.style.display = 'none';
+							        } else {
+							            orderIndexField.style.display = 'block';
+							        }
+							    }
+						</script>
 					</div>
 				</div>
 			</div>

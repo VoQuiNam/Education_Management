@@ -44,13 +44,16 @@ public class User{
 
 	@Column(name = "type")
 	protected String type;
+	
+	@Column(name = "image")
+	protected String image;
 
 	public User() {
 	}
 
 	
 	public User(int id, String firstName, String lastName, LocalDate dob, String gender, String address,
-			String phoneNumber) {
+			String phoneNumber,  String image) {
 		super();
 		this.id = id;
 		this.firstName = firstName;
@@ -59,11 +62,12 @@ public class User{
 		this.gender = gender;
 		this.address = address;
 		this.phoneNumber = phoneNumber;
+		this.image = image;
 	}
 
 
 	public User(int id, String firstName, String lastName, LocalDate dob, String gender, String address,
-			String phoneNumber, String account, String password) {
+			String phoneNumber, String account, String password, String image) {
 		super();
 		this.id = id;
 		this.firstName = firstName;
@@ -74,11 +78,12 @@ public class User{
 		this.phoneNumber = phoneNumber;
 		this.account = account;
 		this.password = password;
+		this.image = image;
 	}
 
 
 	public User(int id, String firstName, String lastName, LocalDate dob, String gender, String address, String phoneNumber,
-			String account, String password, String type) {
+			String account, String password, String type, String image) {
 		super();
 		this.id = id;
 		this.firstName = firstName;
@@ -90,6 +95,7 @@ public class User{
 		this.account = account;
 		this.password = password;
 		this.type = type;
+		this.image = image;
 	}
 
 	public User(String firstName, String lastName, LocalDate dob, String gender, String address, String phoneNumber,
@@ -104,6 +110,21 @@ public class User{
 		this.account = account;
 		this.password = password;
 		this.type = type;
+	}
+	
+	public User(String firstName, String lastName, LocalDate dob, String gender, String address, String phoneNumber,
+			String account, String password, String type, String image) {
+		super();
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.dob = dob;
+		this.gender = gender;
+		this.address = address;
+		this.phoneNumber = phoneNumber;
+		this.account = account;
+		this.password = password;
+		this.type = type;
+		this.image = image;
 	}
 
 	// Getters and setters
@@ -207,6 +228,16 @@ public class User{
 		if (id != other.id)
 			return false;
 		return true;
+	}
+
+
+	public String getImage() {
+		return image;
+	}
+
+
+	public void setImage(String image) {
+		this.image = image;
 	}
 
 }
