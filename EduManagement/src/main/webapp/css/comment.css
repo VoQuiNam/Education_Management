@@ -4,6 +4,7 @@ body {
 	height: 100%;
 	width: 100%;
 	background-color: #f4f4f9;
+	overflow-x: hidden;
 
 }
 
@@ -111,4 +112,117 @@ body {
 
 class_edu{
 	font-size: 20px;
+}
+
+
+/* Style for the reply form container */
+.reply-form {
+    background-color: #f9f9f9; /* Light background color */
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    margin-top: 10px;
+    font-family: Arial, sans-serif;
+}
+
+/* Style for the textarea where the user types the reply */
+.reply-form textarea {
+    width: 100%; /* Full width */
+    height: 40px; /* Set height for the textarea */
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc; /* Light border */
+    resize: vertical; /* Allow vertical resize */
+    font-size: 14px;
+    color: #333; /* Text color */
+    background-color: #fff; /* White background */
+    box-sizing: border-box; /* Ensure padding doesn't affect width */
+}
+
+/* Style for the submit button */
+.reply-form button {
+    display: inline-block;
+    background-color: #3085d6; /* Button color */
+    color: #fff; /* Text color */
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+/* Style for button hover effect */
+.reply-form button:hover {
+    background-color: #1e70a1; /* Darker blue on hover */
+}
+
+/* Optional: Style the "Reply" link */
+.media-detail a {
+    text-decoration: none;
+    color: #3085d6; /* Blue color for links */
+    margin-right: 10px;
+}
+
+.media-detail a:hover {
+    color: #1e70a1; /* Darker blue when hovered */
+}
+
+/* Style for the "Reply" link icon */
+.media-detail a i {
+    margin-right: 5px;
+}
+
+.replies-container {
+   margin-left: 50px;
+    margin-top: 14px;
+    padding-left: 15px;
+}
+
+.reply-comment {
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+}
+
+
+/* Container for buttons */
+.btn-container {
+    display: flex;
+    justify-content: flex-start; /* Align buttons to the left */
+    gap: 10px; /* Space between buttons */
+    margin-top: 10px; /* Add spacing above buttons */
+}
+
+/* General button styles */
+.button_ {
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Save button styles */
+.btn-save {
+    background-color: #4CAF50; /* Green */
+    color: white;
+}
+
+.btn-save:hover {
+    background-color: #45a049;
+}
+
+/* Cancel button styles */
+.btn-cancel {
+    background-color: #f44336; /* Red */
+    color: white;
+}
+
+.btn-cancel:hover {
+    background-color: #e53935;
 }

@@ -9,13 +9,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
-
+import java.util.Map;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.joctopus.dao.BannerDao;
 import com.joctopus.dao.BannerDaoImpl;
 import com.joctopus.dao.ClassesDao;
@@ -41,6 +44,8 @@ public class BannerController extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String action = request.getParameter("action");
+		System.out.println("Action: " + request.getParameter("action"));
+
 
 		try {
 			switch (action) {
@@ -62,6 +67,9 @@ public class BannerController extends HttpServlet {
 			case "/listBanner":
 				listBanners(request, response);
 				break;
+			case "updateOrder":
+                updateOrder(request, response);
+                break;
 			default:
 				listBanners(request, response);
 				break;
@@ -90,48 +98,57 @@ public class BannerController extends HttpServlet {
 		List<Banner> listBanner = bannerDao.selectAllBanners();
 		System.out.println("Banners retrieved: " + listBanner.size()); // chuyển dữ liệu từ serlvet qua jsp để hiển thị
 																		// dữ liệu cho người dùng
-
-		/*
-		 * // Sắp xếp danh sách listBanner.sort((b1, b2) -> { // Nếu cả hai đều có
-		 * isActive giống nhau, sắp xếp theo orderIndex if (b1.isIsActive() ==
-		 * b2.isIsActive()) { return Integer.compare(b1.getOrderIndex(),
-		 * b2.getOrderIndex()); } // Ưu tiên isActive == true lên trước return
-		 * b1.isIsActive() ? -1 : 1; });
-		 */
 		request.setAttribute("listBanner", listBanner);
 		RequestDispatcher dispatcher = request.getRequestDispatcher("Banner/BannerList.jsp");
 		dispatcher.forward(request, response);
 	}
 
 	private void insertBanners(HttpServletRequest request, HttpServletResponse response)
-			throws SQLException, IOException, ServletException {
-		String Title = request.getParameter("Title");
-		String Description = request.getParameter("Description");
-		boolean IsActive = Boolean.parseBoolean(request.getParameter("IsActive"));
-		String Position = request.getParameter("Position");
+	        throws SQLException, IOException, ServletException {
+	    try {
+	        // Get data from form
+	        String title = request.getParameter("Title");
+	        String description = request.getParameter("Description");
+	        boolean isActive = Boolean.parseBoolean(request.getParameter("IsActive"));
+	        String position = request.getParameter("Position");
 
+	        // Handle file upload
+	        String uploadPath = getServletContext().getRealPath("") + File.separator + "images";
+	        File uploadDir = new File(uploadPath);
+	        if (!uploadDir.exists() && !uploadDir.mkdir()) {
+	            throw new IOException("Failed to create upload directory at " + uploadPath);
+	        }
 
-		// Handle file upload
-		String uploadPath = getServletContext().getRealPath("") + File.separator + "images";
-		File uploadDir = new File(uploadPath);
-		if (!uploadDir.exists()) {
-			uploadDir.mkdir();
-		}
+	        Part filePart = request.getPart("ImageUrl");
+	        String fileName = extractFileName(filePart);
+	        String filePath = uploadPath + File.separator + fileName;
+	        filePart.write(filePath);
 
-		Part filePart = request.getPart("ImageUrl");
-		String fileName = extractFileName(filePart);
-		String filePath = uploadPath + File.separator + fileName;
+	        String dbFileName = "images/" + fileName;
 
-		filePart.write(filePath); // Save file to the specified directory
-		String dbFileName = "images/" + fileName;
+	        // Get max playOrder for the specific position
+	        //Đảm bảo rằng phương thức này là thread-safe, tức là chỉ có một luồng thực thi phương thức này cùng một lúc.
+	        synchronized (this) {
+	            int maxPlayOrder = bannerDao.getMaxPlayOrderByPosition(position);
+	            int newPlayOrder = maxPlayOrder + 1;
 
+	            // Create new Banner object
+	            Banner newBanner = new Banner(title, description, dbFileName, isActive, position, newPlayOrder);
 
-		// Save to the database using Hibernate or your DAO
-		Banner newBanner = new Banner(Title, Description, dbFileName, IsActive, Position);
-		bannerDao.insertBanners(newBanner);
+	            // Save banner to database
+	            bannerDao.insertBanners(newBanner);
+	        }
 
-		response.sendRedirect("BannerController?action=/listBanner");
+	        response.sendRedirect("BannerController?action=/listBanner");
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        request.setAttribute("errorMessage", "Error while inserting the banner: " + e.getMessage());
+	        request.getRequestDispatcher("error.jsp").forward(request, response);
+	    }
 	}
+
+
+
 
 	private String extractFileName(Part part) { // chứa thông tin dữ liệu về cách xử lí
 		String contentDisp = part.getHeader("content-disposition");
@@ -203,6 +220,8 @@ public class BannerController extends HttpServlet {
 			throw new ServletException(
 					"ImageUrl cannot be null. Please upload an image or provide a valid current image.");
 		}
+		
+		int PlayOrder = Integer.parseInt(request.getParameter("PlayOrder"));
 
 		// Nếu có lỗi, chuyển hướng về form và thông báo lỗi
 		if (hasError) {
@@ -212,7 +231,7 @@ public class BannerController extends HttpServlet {
 		}
 
 		// Tạo đối tượng Banner từ thông tin đã nhận
-		Banner updateBanner = new Banner(id, Title, Description, dbFileName, IsActive, Position);
+		Banner updateBanner = new Banner(id, Title, Description, dbFileName, IsActive, Position, PlayOrder);
 
 		// Cập nhật banner thông qua DAO
 		bannerDao.updateBanner(updateBanner);
@@ -229,5 +248,42 @@ public class BannerController extends HttpServlet {
 		request.setAttribute("Banner", existingAcc);
 		dispatcher.forward(request, response);
 	}
+	
+	protected void updateOrder(HttpServletRequest request, HttpServletResponse response)
+	        throws ServletException, IOException {
+	    try {
+	        // Parse the JSON request body
+	        StringBuilder sb = new StringBuilder();
+	        BufferedReader reader = request.getReader();
+	        String line;
+	        while ((line = reader.readLine()) != null) {
+	            sb.append(line);
+	        }
+	        String json = sb.toString();
+
+	        // Sử dụng ObjectMapper để ánh xạ JSON thành danh sách Map
+	        ObjectMapper mapper = new ObjectMapper();
+	        List<Map<String, Object>> orderList = mapper.readValue(
+	                json, new com.fasterxml.jackson.core.type.TypeReference<List<Map<String, Object>>>() {});
+
+	        // Update the play order in the database
+	        for (Map<String, Object> orderItem : orderList) {
+	            int id = Integer.parseInt(orderItem.get("BannerID").toString());
+	            int playOrder = Integer.parseInt(orderItem.get("PlayOrder").toString());
+	            bannerDao.updatePlayOrder(id, playOrder); // Implement this method in BannerDaoImpl
+	        }
+
+	        // Gửi phản hồi thành công
+	        response.setStatus(HttpServletResponse.SC_OK);
+	        response.getWriter().write("{\"message\":\"Order updated successfully\"}");
+	    } catch (Exception e) {
+	        // In lỗi và gửi phản hồi thất bại
+	        e.printStackTrace();
+	        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+	        response.getWriter().write("{\"error\":\"Failed to update order\"}");
+	    }
+	}
+
+
 
 }

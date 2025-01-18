@@ -20,4 +20,37 @@
                 });
             });
         });
+        
+        
     });
+    
+    
+    function confirmDelete(commentId, classId) {
+		console.log('comment: ',commentId);
+		console.log('class: ',classId);
+	    // Check if commentId and classId are valid
+	    if (!commentId || !classId || classId === "") {
+	        Swal.fire({
+	            title: 'Error',
+	            text: 'Missing or invalid comment ID or class ID.',
+	            icon: 'error'
+	        });
+	        return; // Stop further execution
+	    }
+
+	    Swal.fire({
+	        title: 'Are you sure?',
+	        text: "Do you really want to delete this comment?",
+	        icon: 'warning',
+	        showCancelButton: true,
+	        confirmButtonColor: '#3085d6',
+	        cancelButtonColor: '#d33',
+	        confirmButtonText: 'Yes, delete it!'
+	    }).then((result) => {
+	        if (result.isConfirmed) {
+	            // Redirect to the delete URL
+	        	window.location.href = "/EduManagement/CommentAdminssionController?action=/deleteComment&id=" + commentId + "&class_id=" + classId;
+	        }
+	    });
+	}
+

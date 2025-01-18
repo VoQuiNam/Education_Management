@@ -7,7 +7,7 @@
 <c:import url="/WEB-INF/fragments/header.jsp" />
 <meta http-equiv="Content-Language" content="vi" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-
+<script src="<c:url value='/js/banner.js'/>"></script>
 <link rel="stylesheet"
 	href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <script
@@ -50,48 +50,43 @@
 								</div>
 								<div class="card-body">
 									<c:choose>
-
 										<c:when test="${empty listBanner}">
 											<div class="alert alert-warning" role="alert">No Banner
 												available.</div>
 										</c:when>
-
 										<c:otherwise>
 											<!-- Table for 'banner_slide' -->
 											<table id="table1" class="table table-bordered table-striped">
 												<thead>
 													<tr>
-														<th>#</th>
+														<th>Play Order</th>
 														<th>Title</th>
 														<th>Description</th>
 														<th>Image Url</th>
 														<th>Is Active</th>
 														<th>Position</th>
+														<th>Actions</th>
 													</tr>
 												</thead>
 												<tbody>
 													<!-- Filter banners with position 'banner_slide' -->
-													<c:set var="counter1" value="1" />
-													<!-- Initialize counter for table1 -->
 													<c:forEach var="banners" items="${listBanner}">
 														<c:if test="${banners.position == 'banner_slide'}">
-															<tr>
-																<td><c:out value="${counter1}" /></td>
-																<!-- Display counter -->
+															<tr class="clickable-row" data-id="${banners.bannerID}">
+																<td><c:out value="${banners.playOrder}" /></td>
 																<td><c:out value="${banners.title}" /></td>
 																<td><c:out value="${banners.description}" /></td>
 																<td><img src="${banners.imageUrl}"
 																	alt="Banner Image" style="width: 100px; height: auto;" /></td>
 																<td><c:out value="${banners.isActive}" /></td>
 																<td><c:out value="${banners.position}" /></td>
+
 																<td class="action-buttons"><a
 																	href="<%=request.getContextPath()%>/BannerController?action=/editBanner&BannerID=${banners.bannerID}"
 																	class="btn btn-warning">Edit</a> <a
 																	href="<%=request.getContextPath()%>/BannerController?action=/deleteBanner&BannerID=${banners.bannerID}"
 																	class="btn btn-danger delete-button">Delete</a></td>
 															</tr>
-															<c:set var="counter1" value="${counter1 + 1}" />
-															<!-- Increment counter -->
 														</c:if>
 													</c:forEach>
 												</tbody>
@@ -102,45 +97,42 @@
 												style="margin-top: 30px;">
 												<thead>
 													<tr>
-														<th>#</th>
+														<th>Play Order</th>
 														<th>Title</th>
 														<th>Description</th>
 														<th>Image Url</th>
 														<th>Is Active</th>
 														<th>Position</th>
+														<th>Actions</th>
 													</tr>
 												</thead>
 												<tbody>
 													<!-- Filter banners with position 'banner_footer' -->
-													<c:set var="counter2" value="1" />
-													<!-- Initialize counter for table2 -->
 													<c:forEach var="banners" items="${listBanner}">
 														<c:if test="${banners.position == 'banner_footer'}">
-															<tr>
-																<td><c:out value="${counter2}" /></td>
-																<!-- Display counter -->
+															<tr class="clickable-row" data-id="${banners.bannerID}">
+																<td><c:out value="${banners.playOrder}" /></td>
 																<td><c:out value="${banners.title}" /></td>
 																<td><c:out value="${banners.description}" /></td>
 																<td><img src="${banners.imageUrl}"
 																	alt="Banner Image" style="width: 100px; height: auto;" /></td>
 																<td><c:out value="${banners.isActive}" /></td>
 																<td><c:out value="${banners.position}" /></td>
+
 																<td class="action-buttons"><a
 																	href="<%=request.getContextPath()%>/BannerController?action=/editBanner&BannerID=${banners.bannerID}"
 																	class="btn btn-warning">Edit</a> <a
 																	href="<%=request.getContextPath()%>/BannerController?action=/deleteBanner&BannerID=${banners.bannerID}"
 																	class="btn btn-danger delete-button">Delete</a></td>
 															</tr>
-															<c:set var="counter2" value="${counter2 + 1}" />
-															<!-- Increment counter -->
 														</c:if>
 													</c:forEach>
 												</tbody>
 											</table>
-
 										</c:otherwise>
 									</c:choose>
 								</div>
+
 							</div>
 						</div>
 					</div>
@@ -150,5 +142,6 @@
 		<c:import url="/WEB-INF/fragments/footer.jsp" />
 	</div>
 	<c:import url="/WEB-INF/fragments/addition.jsp" />
+	
 </body>
 </html>

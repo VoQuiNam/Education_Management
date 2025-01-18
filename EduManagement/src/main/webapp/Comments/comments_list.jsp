@@ -58,22 +58,19 @@
 												class="table table-bordered table-striped">
 												<thead>
 													<tr>
-														<th>User id</th>
+														<th>User name</th>
 														<th>Content</th>
 														<th>Create at</th>
-														<th>Class id</th>
+														<th>Class</th>
 													</tr>
 												</thead>
 												<tbody>
 													<c:forEach var="comments" items="${listComments}">
 														<tr>
-															<td><c:out value="${comments.user_id}" /></td>
+															 <td><c:out value="${comments.user_id.firstName}" /> <c:out value="${comments.user_id.lastName}" /></td>
 															<td><c:out value="${comments.content}" /></td>
 															<td><c:out value="${comments.created_at}" /></td>
-															<td><c:out value="${comments.class_id}" /></td>
-															<td class="action-buttons"> <a
-																href="<%=request.getContextPath()%>/ClassesController?action=/deleteCl&id=${classes.id}"
-																class="btn btn-danger delete-button">Delete</a></td>
+															<td><c:out value="${comments.class_id.class_name}" /></td>
 														</tr>
 													</c:forEach>
 												</tbody>

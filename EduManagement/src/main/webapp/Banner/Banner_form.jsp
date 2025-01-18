@@ -69,6 +69,12 @@
 							<input type="hidden" name="BannerID"
 								value="<c:out value='${Banner.bannerID}' />" />
 						</c:if>
+						
+						<c:if test="${Banner != null}">
+							<input type="hidden" name="PlayOrder"
+								value="<c:out value='${Banner.playOrder}' />" />
+						</c:if>
+						
 
 						<fieldset class="form-group">
 							<label>Title</label> <input type="text"
@@ -99,21 +105,6 @@
 								value="${Banner.imageUrl}">
 						</fieldset>
 
-					<%-- 	<fieldset class="form-group">
-							<label>Start Date</label> <input type="date"
-								value="<c:out value='${Banner.startDate}' />"
-								class="form-control" name="StartDate">
-							<span class="text-danger">${requestScope.dob_error}</span>
-						</fieldset>
-
-						<fieldset class="form-group">
-							<label>End Date</label> <input type="date"
-								value="<c:out value='${Banner.endDate}' />" class="form-control"
-								name="EndDate">
-							<span class="text-danger">${requestScope.dob_error}</span>
-						</fieldset> --%>
-
-
 						<fieldset class="form-group">
 							<label>Is Active</label> <select class="form-control"
 								name="IsActive" onchange="toggleOrderIndex(this)">
@@ -131,13 +122,6 @@
 									<c:if test="${Banner.position == 'banner_footer'}">selected</c:if>>Footer</option>
 							</select>
 						</fieldset>
-
-
-						<%-- <fieldset class="form-group" id="orderIndexField" style="display: ${Banner.isActive ? 'block' : 'none'};">
-							<label>Order Index</label> <input type="number"
-								value="<c:out value='${Banner.orderIndex}' />"
-								class="form-control" name="OrderIndex" min="0">
-						</fieldset> --%>
 
 						<button type="submit" class="btn btn-success">Save</button>
 						</form>

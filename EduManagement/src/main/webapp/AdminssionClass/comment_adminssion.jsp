@@ -24,7 +24,9 @@
 <link rel="stylesheet" href="<c:url value='/css/style.css'/>">
 <link rel="stylesheet" href="<c:url value='/css/iconuser.css'/>">
 <link rel="stylesheet" href="<c:url value='/css/comment.css'/>">
+<script src="<c:url value='/js/comment.js'/>"></script>
 <script src="<c:url value='/js/adminssionClass.js'/>"></script>
+<script src="<c:url value='/js/delete_waring.js'/>"></script>
 
 <%-- <link rel="stylesheet" href="<c:url value='/css/bootstrap/css/bootstrap.css'/>"> --%>
 
@@ -111,9 +113,7 @@
 			</c:if>
 		</div>
 		<h3>New Comment</h3>
-		<form
-			action="<%=request.getContextPath()%>/CommentAdminssionController?action=/postComment"
-			method="post">
+		<form id="commentForm" method="post">
 			<input type="hidden" name="class_id"
 				value="<%=request.getParameter("class_id")%>" />
 			<textarea placeholder="Write your comment here..." name="content"
@@ -121,38 +121,118 @@
 			<button type="submit" class="btn">Submit</button>
 		</form>
 
+
 		<h3>Comments</h3>
 		<div class="list__comment">
 			<c:forEach var="comment" items="${listComment}">
-				<div class="media">
-					<!-- Avatar của người dùng -->
-					<img
-						src="${comment.user_id.image != null ? comment.user_id.image : 'https://bootdey.com/img/Content/avatar/avatar1.png'}"
-						alt="User Avatar">
+				<c:if test="${comment.parentComment == null}">
+					<!-- Top-level comment -->
+					<div class="media" id="comment-${comment.id}">
+						<img
+							src="${comment.user_id.image != null ? comment.user_id.image : 'https://bootdey.com/img/Content/avatar/avatar1.png'}"
+							alt="User Avatar">
+						<div class="media-body">
+							<h4>${comment.user_id.firstName}${comment.user_id.lastName}</h4>
+							<p id="comment-content-${comment.id}">${comment.content}</p>
+							<div class="media-detail">
+								<span><i class="fa fa-calendar"></i>
+									${comment.created_at}</span> <a href="#"
+									onclick="showReplyForm('${comment.id}')"><i
+									class="fa fa-reply"></i> Reply</a> <a href="javascript:void(0);"
+									onclick="editComment(this, '${comment.id}')"><i
+									class="fa fa-edit"></i> Edit</a> <a href="javascript:void(0);"
+									onclick="confirmDelete('${comment.id}', '${comment.class_id.id}')"><i
+									class="fa fa-trash delete-button"></i> Delete</a>
+							</div>
 
-					<div class="media-body">
-						<!-- Tên người dùng -->
-						<h4>${comment.user_id.firstName}${comment.user_id.lastName}</h4>
+							<!-- Reply form -->
+							<div id="reply-form-${comment.id}" class="reply-form"
+								style="display: none;" data-class-id="${comment.class_id.id}">
+								<textarea id="reply-text-${comment.id}"
+									placeholder="Write your reply..."></textarea>
+								<button onclick="submitReply('${comment.id}')">Submit
+									Reply</button>
+							</div>
 
-						<!-- Nội dung bình luận -->
-						<p>${comment.content}</p>
 
-						<!-- Chi tiết bình luận -->
-						<div class="media-detail">
-							<!-- Ngày tạo bình luận -->
-							<span><i class="fa fa-calendar"></i> ${comment.created_at}
-							</span>
+							<!-- Recursively display replies -->
+							<div id="replies-${comment.id}" class="replies-container">
+								<c:forEach var="reply" items="${listComment}">
+									<c:if
+										test="${reply.parentComment != null && reply.parentComment.id == comment.id}">
+										<div class="media" style="margin-left: 30px;"
+											id="reply-${reply.id}">
+											<img
+												src="${reply.user_id.image != null ? reply.user_id.image : 'https://bootdey.com/img/Content/avatar/avatar1.png'}"
+												alt="User Avatar">
+											<div class="media-body">
+												<h4>${reply.user_id.firstName}
+													${reply.user_id.lastName}</h4>
+												<p id="comment-content-${reply.id}">${reply.content}</p>
+												<div class="media-detail">
+													<span><i class="fa fa-calendar"></i>
+														${reply.created_at}</span> <a href="#"
+														onclick="showReplyForm('${reply.id}')"><i
+														class="fa fa-reply"></i> Reply</a> <a
+														href="javascript:void(0);"
+														onclick="editComment(this, '${reply.id}')"><i
+														class="fa fa-edit"></i> Edit</a> <a href="javascript:void(0);"
+														onclick="confirmDelete('${reply.id}', '${reply.class_id.id}')"><i
+														class="fa fa-trash delete-button"></i> Delete</a>
+												</div>
 
-							<!-- Các hành động -->
-							<a href="#"><i class="fa fa-thumbs-up"></i> Like</a> <a href="#"><i
-								class="fa fa-reply"></i> Reply</a> <a href="#"><i
-								class="fa fa-edit"></i> Edit</a> <a href="#"><i
-								class="fa fa-trash"></i> Delete</a>
+												<!-- Reply form for replies -->
+												<div id="reply-form-${reply.id}" class="reply-form"
+													style="display: none;" data-class-id="${reply.class_id.id}">
+													<textarea id="reply-text-${reply.id}"
+														placeholder="Write your reply..."></textarea>
+													<button onclick="submitReply('${reply.id}')">Submit
+														Reply</button>
+												</div>
+
+												<!-- Recursively display further replies -->
+												<div id="replies-${reply.id}" class="replies-container">
+													<c:forEach var="nestedReply" items="${listComment}">
+														<c:if
+															test="${nestedReply.parentComment != null && nestedReply.parentComment.id == reply.id}">
+															<div class="media" style="margin-left: 60px;"
+																id="nested-reply-${nestedReply.id}">
+																<img
+																	src="${nestedReply.user_id.image != null ? nestedReply.user_id.image : 'https://bootdey.com/img/Content/avatar/avatar1.png'}"
+																	alt="User Avatar">
+																<div class="media-body">
+																	<h4>${nestedReply.user_id.firstName}
+																		${nestedReply.user_id.lastName}</h4>
+																	<p id="comment-content-${nestedReply.id}">${nestedReply.content}</p>
+																	<div class="media-detail">
+																		<span><i class="fa fa-calendar"></i>
+																			${nestedReply.created_at}</span> <a href="#"
+																			onclick="showReplyForm('${nestedReply.id}')"><i
+																			class="fa fa-reply"></i> Reply</a> <a
+																			href="javascript:void(0);"
+																			onclick="editComment(this, '${nestedReply.id}')"><i
+																			class="fa fa-edit"></i> Edit</a> <a
+																			href="javascript:void(0);"
+																			onclick="confirmDelete('${nestedReply.id}', '${nestedReply.class_id.id}')"><i
+																			class="fa fa-trash delete-button"></i> Delete</a>
+																	</div>
+																</div>
+															</div>
+														</c:if>
+													</c:forEach>
+												</div>
+											</div>
+										</div>
+									</c:if>
+								</c:forEach>
+							</div>
 						</div>
 					</div>
-				</div>
+				</c:if>
 			</c:forEach>
 		</div>
+
+
 	</section>
 	<c:import url="/WEB-INF/fragments/footerclient.jsp" />
 
@@ -171,6 +251,115 @@
 	<!-- 
     - ionicon link
   -->
+
+	<script>
+		document
+				.getElementById("commentForm")
+				.addEventListener(
+						"submit",
+						function(e) {
+
+							var classId = document
+									.querySelector('input[name="class_id"]').value;
+							var content = document
+									.querySelector('textarea[name="content"]').value
+									.trim();
+
+							if (!content) {
+								Swal.fire({
+									icon : 'warning',
+									title : 'Cảnh báo',
+									text : 'Bạn cần nhập nội dung bình luận!',
+								});
+								return;
+							}
+
+							var xhr = new XMLHttpRequest();
+							xhr
+									.open(
+											"POST",
+											"CommentAdminssionController?action=/postComment",
+											true);
+							xhr.setRequestHeader("Content-Type",
+									"application/x-www-form-urlencoded");
+
+							xhr.onreadystatechange = function() {
+								if (xhr.readyState === XMLHttpRequest.DONE) {
+									if (xhr.status === 200) {
+										try {
+											var response = JSON
+													.parse(xhr.responseText);
+											console.log("Server response:",
+													response);
+
+											if (response.success) {
+												if (response.redirectUrl) {
+													window.location.href = response.redirectUrl; // Chuyển hướng
+												} else {
+													Swal
+															.fire({
+																icon : 'error',
+																title : 'Lỗi',
+																text : 'Không tìm thấy URL chuyển hướng.',
+															});
+												}
+											} else {
+												Swal
+														.fire({
+															icon : 'error',
+															title : 'Thất bại',
+															text : response.error
+																	|| 'Không thể gửi bình luận.',
+														});
+											}
+										} catch (e) {
+											console.error(
+													"Error parsing JSON:",
+													xhr.responseText);
+											Swal
+													.fire({
+														icon : 'error',
+														title : 'Lỗi',
+														text : 'Phản hồi từ server không hợp lệ!',
+													});
+										}
+									} else {
+										Swal
+												.fire({
+													icon : 'error',
+													title : 'Lỗi Server',
+													text : `Mã lỗi: ${xhr.status}. Vui lòng thử lại!`,
+												});
+									}
+								}
+							};
+
+							// Chuẩn bị dữ liệu gửi đi
+							var requestData = "content="
+									+ encodeURIComponent(content)
+									+ "&class_id="
+									+ encodeURIComponent(classId);
+							console.log("Sending data:", requestData);
+							xhr.send(requestData);
+						});
+		<c:if test="${not empty sessionScope.successMessage}">
+		Swal.fire({
+			title : 'Success',
+			text : '${sessionScope.successMessage}',
+			icon : 'success'
+		});
+		<c:remove var="successMessage" scope="session"/>
+		</c:if>
+
+		<c:if test="${not empty sessionScope.errorMessage}">
+		Swal.fire({
+			title : 'Error',
+			text : '${sessionScope.errorMessage}',
+			icon : 'error'
+		});
+		<c:remove var="errorMessage" scope="session"/>
+		</c:if>
+	</script>
 	<script type="module"
 		src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
 	<script nomodule

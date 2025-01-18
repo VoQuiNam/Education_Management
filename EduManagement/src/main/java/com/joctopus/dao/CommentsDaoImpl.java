@@ -37,7 +37,7 @@ public class CommentsDaoImpl implements CommentsDao{
 			transaction = session.beginTransaction();
 			// get an user object
 			
-			comments = session.createQuery("from com.joctopus.model.comments").getResultList();
+			comments = session.createQuery("from com.joctopus.model.Comments").getResultList();
 			
 			// commit transaction
 			transaction.commit();

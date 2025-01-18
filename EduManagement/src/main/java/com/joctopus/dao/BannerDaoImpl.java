@@ -87,48 +87,102 @@ public class BannerDaoImpl implements BannerDao{
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Banner> selectAllBanners() {
+	    Transaction transaction = null;
+	    List<Banner> banner = null;
+	    Session session = HibernateUtil.getSessionFactory().openSession();
+	    try {
+	        // Start a transaction
+	        transaction = session.beginTransaction();
+	        
+	        // Query banners sorted by playOrder
+	        banner = session.createQuery("FROM com.joctopus.model.Banner ORDER BY playOrder ASC").getResultList();
+	        
+	        // Commit transaction
+	        transaction.commit();
+	    } catch (Exception e) {
+	        if (transaction != null) {
+	            transaction.rollback();
+	        }
+	        e.printStackTrace();
+	    }
+	    return banner;
+	}
 
-		Transaction transaction = null;
-		List<Banner> banner = null;
-		Session session = HibernateUtil.getSessionFactory().openSession();
-		try  {
-			// start a transaction
-			transaction = session.beginTransaction();
-			// get an user object
-			
-			banner = session.createQuery("from com.joctopus.model.Banner").getResultList();
-			
-			// commit transaction
-			transaction.commit();
-		} catch (Exception e) {
-			if (transaction != null) {
-				transaction.rollback();
-			}
-			e.printStackTrace();
-		}
-		return banner;
-	} 
 	
 	@Override
-	public void deleteBanner(int id) throws SQLException{
-        Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            // Bắt đầu một transaction
-            transaction = session.beginTransaction();
-            
-         // Delete a todo object
-			Banner banner = session.get(com.joctopus.model.Banner.class, id);
+	public void deleteBanner(int id) throws SQLException {
+	    Transaction transaction = null;
+	    try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+	        // Bắt đầu transaction
+	        transaction = session.beginTransaction();
+	        
+	        // Lấy banner cần xóa
+	        Banner banner = session.get(Banner.class, id);
+	        if (banner == null) {
+	            throw new IllegalArgumentException("Banner with ID " + id + " not found.");
+	        }
 
-            // Xóa người dùng
-            session.delete(banner);
+	        int playOrder = banner.getPlayOrder();
+	        String position = banner.getPosition();
 
-            // Commit transaction
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
-        }
-    }
+	        // Xóa banner
+	        session.delete(banner);
+
+	        // Cập nhật lại PlayOrder cho các banner khác trong cùng position
+	        session.createQuery("UPDATE Banner b SET b.PlayOrder = b.PlayOrder - 1 " +
+	                            "WHERE b.Position = :position AND b.PlayOrder > :playOrder")
+	               .setParameter("position", position)
+	               .setParameter("playOrder", playOrder)
+	               .executeUpdate();
+
+	        // Commit transaction
+	        transaction.commit();
+	    } catch (Exception e) {
+	        if (transaction != null) {
+	            transaction.rollback();
+	        }
+	        e.printStackTrace();
+	        throw new SQLException("Error while deleting banner and updating PlayOrder.", e);
+	    }
+	}
+
+	
+	@Override
+	public int getMaxPlayOrderByPosition(String position) {
+	    try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+	    	//Sử dụng hàm COALESCE để trả về 0 nếu không có giá trị nào (tránh lỗi null).
+	        Integer maxPlayOrder = (Integer) session
+	            .createQuery("SELECT COALESCE(MAX(b.PlayOrder), 0) FROM Banner b WHERE b.Position = :position")
+	            .setParameter("position", position)
+	            .uniqueResult();
+	        System.out.println("Max PlayOrder fetched for position " + position + ": " + maxPlayOrder);
+	        return maxPlayOrder != null ? maxPlayOrder : 0;
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return 0; // Default value in case of error
+	    }
+	}
+
+	
+	@Override
+	public void updatePlayOrder(int id, int playOrder) {
+	    Transaction transaction = null;
+	    try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+	        transaction = session.beginTransaction();
+	        Query query = session.createQuery("UPDATE Banner SET PlayOrder = :playOrder WHERE id = :id");
+	        query.setParameter("playOrder", playOrder);
+	        query.setParameter("id", id);
+	        query.executeUpdate();
+	        transaction.commit();
+	    } catch (Exception e) {
+	        if (transaction != null) {
+	            transaction.rollback();
+	        }
+	        e.printStackTrace();
+	    }
+	}
+
+
+
+
 }

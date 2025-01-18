@@ -184,7 +184,7 @@ request.setAttribute("notifications", notifications);
                 </li>
                  <li class="nav-item">
                     <a href="<%=request.getContextPath()%>/CommentsController?action=/listComments" class="nav-link">
-                        <i class="nav-icon fas fa-image"></i>
+                        <i class="nav-icon fas fa-comments"></i>
                         <p>Comments</p>
                     </a>
                 </li>

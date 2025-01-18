@@ -33,11 +33,14 @@ public class Banner {
 
 	@Column(name = "Position")
 	protected String Position;
+	
+	@Column(name = "PlayOrder")
+	protected int PlayOrder;
 
 	public Banner() {
 	}
 
-	public Banner(int bannerID, String title, String description, String imageUrl, boolean isActive, String position) {
+	public Banner(int bannerID, String title, String description, String imageUrl, boolean isActive, String position, int PlayOrder) {
 		super();
 		this.BannerID = bannerID;
 		this.Title = title;
@@ -45,16 +48,18 @@ public class Banner {
 		this.ImageUrl = imageUrl;
 		this.IsActive = isActive;
 		this.Position = position;
+		this.PlayOrder = PlayOrder;
 	}
 
 	public Banner(String title, String description, String imageUrl,
-			boolean isActive, String position) {
+			boolean isActive, String position, int PlayOrder) {
 		super();
 		this.Title = title;
 		this.Description = description;
 		this.ImageUrl = imageUrl;
 		this.IsActive = isActive;
 		this.Position = position;
+		this.PlayOrder = PlayOrder;
 	}
 
 	public int getBannerID() {
@@ -105,4 +110,14 @@ public class Banner {
 	public void setPosition(String position) {
 		this.Position = position;
 	}
+
+	public int getPlayOrder() {
+		return PlayOrder;
+	}
+
+	public void setPlayOrder(int playOrder) {
+		PlayOrder = playOrder;
+	}
+	
+	
 }

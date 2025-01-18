@@ -6,6 +6,8 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -32,6 +34,13 @@ public class ProfileUserController extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		 // Check if the user is logged in
+        HttpSession session = request.getSession(false); // Get the session, don't create a new one
+        if (session == null || session.getAttribute("loggedInUser") == null) {
+            // Redirect to the login page if the user is not logged in
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
 		String action = request.getParameter("action");
 		try {
 			switch (action) {

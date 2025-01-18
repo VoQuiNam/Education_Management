@@ -6,6 +6,8 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Comparator;
@@ -28,7 +30,15 @@ public class HomeClientController extends HttpServlet {
     // Xử lý các yêu cầu GET
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String action = request.getParameter("action"); // Lấy hành động từ tham số request
+        // Check if the user is logged in
+        HttpSession session = request.getSession(false); // Get the session, don't create a new one
+        if (session == null || session.getAttribute("loggedInUser") == null) {
+            // Redirect to the login page if the user is not logged in
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
+        String action = request.getParameter("action"); // Get the action from the request
         try {
             if (action != null) {
                 switch (action) {
@@ -36,13 +46,12 @@ public class HomeClientController extends HttpServlet {
                         listBanners(request, response);
                         break;
                     default:
-                        listBanners(request, response); // Hành động mặc định
+                        listBanners(request, response); // Default action
                         break;
                 }
             } else {
-                listBanners(request, response); // Nếu không có hành động nào, hiển thị danh sách banner
+                listBanners(request, response); // Default to listing banners
             }
-            System.out.println("Action: " + action); // Log hành động để kiểm tra
         } catch (SQLException ex) {
             throw new ServletException(ex);
         }

@@ -17,5 +17,10 @@ public interface CommentAdminssionDao {
 	 
 	 public void postComments(Comments comments) throws SQLException;
 	 
+	 public void deleteComments(int id) throws SQLException;
+	 
+	 public Comments selectComments(int id);
+	 
+	 void updateComments(Comments comments) throws SQLException;	 
 	
 }

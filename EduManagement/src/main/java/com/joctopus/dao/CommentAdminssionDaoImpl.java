@@ -118,6 +118,70 @@ public class CommentAdminssionDaoImpl implements CommentAdminssionDao{
 			e.printStackTrace();
 		}
 	}
+	
+	@Override
+	public void deleteComments(int id) throws SQLException{
+        Transaction transaction = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            // Bắt đầu một transaction
+            transaction = session.beginTransaction();
+            
+         // Delete a todo object
+			Comments comments = session.get(com.joctopus.model.Comments.class, id);
+
+            // Xóa người dùng
+            session.delete(comments);
+
+            // Commit transaction
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        }
+    }
+
+	
+	@Override
+	public Comments selectComments(int id) {
+		Transaction transaction = null;
+		Comments comments = null;
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		try  {
+			// start a transaction
+			transaction = session.beginTransaction();
+			// get an user object
+			comments = session.get(com.joctopus.model.Comments.class, id);
+			// commit transaction
+			transaction.commit();
+		} catch (Exception e) {
+			if (transaction != null) {
+				transaction.rollback();
+			}
+			e.printStackTrace();
+		}
+		return comments;
+	}
+	
+	@Override
+	public void updateComments(Comments comments) throws SQLException {
+		
+		Transaction transaction = null;
+		try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+			// start a transaction
+			transaction = session.beginTransaction();
+			// save the student object
+			session.saveOrUpdate(comments);
+			// commit transaction
+			transaction.commit();
+		} catch (Exception e) {
+			if (transaction != null) {
+				transaction.rollback();
+			}
+			e.printStackTrace();
+		}
+	}
 
 
 

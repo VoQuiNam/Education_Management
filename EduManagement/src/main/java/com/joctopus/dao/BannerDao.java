@@ -18,4 +18,8 @@ public interface BannerDao {
 	public Banner selectBanners(int id);
 	
 	void deleteBanner(int id) throws SQLException;
+	
+	public int getMaxPlayOrderByPosition(String position);
+	
+	public void updatePlayOrder(int id, int playOrder);
 }

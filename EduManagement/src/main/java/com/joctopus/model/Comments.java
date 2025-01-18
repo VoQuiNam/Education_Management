@@ -18,23 +18,27 @@ public class Comments {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
 	protected int id;
-	
+
 	@ManyToOne
 	@JoinColumn(name = "user_id")
 	protected User user_id;
-	
+
 	@Column(name = "content")
 	protected String content;
-	
+
 	@Column(name = "created_at")
 	protected LocalDate created_at;
-	
+
 	@ManyToOne
 	@JoinColumn(name = "class_id")
 	protected Classes class_id;
 
+	@ManyToOne
+	@JoinColumn(name = "parent_comment_id")
+	private Comments parent_comment_id; // Add a field for the parent comment (null for top-level comments)
+
 	public Comments() {
-		
+
 	}
 
 	public Comments(int id, User user_id, String content, LocalDate created_at, Classes class_id) {
@@ -44,6 +48,7 @@ public class Comments {
 		this.content = content;
 		this.created_at = created_at;
 		this.class_id = class_id;
+
 	}
 
 	public Comments(User user_id, String content, LocalDate created_at, Classes class_id) {
@@ -52,6 +57,7 @@ public class Comments {
 		this.content = content;
 		this.created_at = created_at;
 		this.class_id = class_id;
+
 	}
 
 	public int getId() {
@@ -93,9 +99,13 @@ public class Comments {
 	public void setClass_id(Classes class_id) {
 		this.class_id = class_id;
 	}
-	
-	
 
-	
-	
+	public Comments getParentComment() {
+		return parent_comment_id;
+	}
+
+	public void setParentComment(Comments parentComment) {
+		this.parent_comment_id = parentComment;
+	}
+
 }
