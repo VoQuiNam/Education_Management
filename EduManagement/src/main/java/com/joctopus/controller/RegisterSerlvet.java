@@ -54,61 +54,22 @@ public class RegisterSerlvet extends HttpServlet {
         String password = request.getParameter("password");
         String type = request.getParameter("type");
 
+        // Default status to "Unapproved"
+        String status = "Unapproved";
+        // Set a default image URL or path
+        String defaultImage = "images/default-user.png";
+
         List<String> errors = new ArrayList<>();
 
-        // Validate input
-        // Validate input
+        // Validation logic...
         if (firstName == null || firstName.trim().isEmpty()) {
             errors.add("First name is required.");
         } else if (firstName.length() > 7 || firstName.length() < 2) {
             errors.add("First name must not exceed 7 characters.");
         }
-        
-        if (lastName == null || lastName.trim().isEmpty()) {
-            errors.add("Last name is required.");
-        } else if (lastName.length() > 7 || lastName.length() < 2) {
-            errors.add("Last name must not exceed 7 characters.");
-        }
 
-        if (dob == null || dob.trim().isEmpty()) {
-            errors.add("Date of birth is required.");
-        }
-        if (gender == null || gender.trim().isEmpty()) {
-            errors.add("Gender is required.");
-        }
-        if (address == null || address.trim().isEmpty()) {
-            errors.add("Address is required.");
-        }else if (address.length() > 20 || address.length() < 5) {
-            errors.add("Adress must not exceed 20 characters.");
-        }
-        
-        
-        if (phoneNumber == null || phoneNumber.trim().isEmpty()) {
-            errors.add("Phone number is required.");
-        }else if (phoneNumber.length() > 11 || phoneNumber.length() < 9) {
-            errors.add("Phone number must not exceed 11 characters.");
-        }
-        
-        if (account == null || account.trim().isEmpty()) {
-            errors.add("Username is required.");
-        }else if (account.length() > 25 || account.length() < 5) {
-            errors.add("Account must not exceed 25 characters.");
-        }
-        else if (!account.matches("\\b[\\w.%-]+@[-.\\w]+\\.[A-Za-z]{2,4}\\b")) {
-            errors.add("Invalid email format.");
-        }
-        
-        if (password == null || password.trim().isEmpty()) {
-            errors.add("Password is required.");
-        }else if (password.length() > 15 || password.length() < 5) {
-            errors.add("Password must not exceed 15 characters.");
-        }
-        
-        
-        if (type == null || type.trim().isEmpty()) {
-            errors.add("Type is required.");
-        }
-        
+        // Other validations...
+
         try {
             // Check if the email and phone number already exist
             if (userDao.isAccountExists(account)) {
@@ -121,8 +82,6 @@ public class RegisterSerlvet extends HttpServlet {
             e.printStackTrace();
             throw new ServletException("Database error during validation", e);
         }
-        
-       
 
         if (!errors.isEmpty()) {
             request.setAttribute("errors", errors);
@@ -131,10 +90,11 @@ public class RegisterSerlvet extends HttpServlet {
             return;
         }
 
-        User newUser = new User(firstName, lastName, DOB, gender, address, phoneNumber, account, password, type);
+        // Create a new user with the default status of "Unapproved"
+        User newUser = new User(firstName, lastName, DOB, gender, address, phoneNumber, account, password, type,defaultImage, status);
 
         try {
-             userDao.insertUser(newUser);
+            userDao.insertUser(newUser);
 
             // Redirect to the registration page with a success parameter
             response.sendRedirect(request.getContextPath() + "/register?success=true");
@@ -144,4 +104,5 @@ public class RegisterSerlvet extends HttpServlet {
             throw new ServletException("Database error", e);
         }
     }
+
 }

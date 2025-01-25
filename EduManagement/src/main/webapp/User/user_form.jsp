@@ -60,13 +60,11 @@
 								onchange="previewImage(event)">
 
 							<!-- Display the current image -->
-							<br> <img id="currentImage"
-								src="${User.image}" alt=""
+							<br> <img id="currentImage" src="${User.image}" alt=""
 								style="max-width: 100%; max-height: 200px;">
 
 							<!-- Hidden field to store the current image URL -->
-							<input type="hidden" name="currentImage"
-								value="${Banner.imageUrl}">
+							<input type="hidden" name="currentImage" value="${User.image}">
 						</fieldset>
 						<fieldset class="form-group">
 							<label>First name</label> <input type="text"
@@ -144,10 +142,20 @@
 							</select> <span class="text-danger">${requestScope.type_error}</span>
 						</fieldset>
 
-
+						<fieldset class="form-group">
+							<label for="status">Status</label> <select class="form-control"
+								id="status" name="status">
+								<option value=""
+									${empty requestScope.status && empty User.status ? 'selected' : ''}>Select</option>
+								<option value="Unapproved"
+									${requestScope.status eq 'Unapproved' || User.status eq 'Unapproved' ? 'selected' : ''}>Unapproved</option>
+								<option value="Approved"
+									${requestScope.status eq 'Approved' || User.status eq 'Approved' ? 'selected' : ''}>Approved</option>
+							</select> <span class="text-danger">${requestScope.status_error}</span>
+						</fieldset>
 						<button type="submit" class="btn btn-success">Save</button>
 						</form>
-						
+
 						<script>
 							// JavaScript function to preview the selected image
 							function previewImage(event) {
@@ -159,15 +167,16 @@
 								};
 								reader.readAsDataURL(event.target.files[0]);
 							}
-							
-							 function toggleOrderIndex(select) {
-							        var orderIndexField = document.getElementById('orderIndexField');
-							        if (select.value == "false") {
-							            orderIndexField.style.display = 'none';
-							        } else {
-							            orderIndexField.style.display = 'block';
-							        }
-							    }
+
+							function toggleOrderIndex(select) {
+								var orderIndexField = document
+										.getElementById('orderIndexField');
+								if (select.value == "false") {
+									orderIndexField.style.display = 'none';
+								} else {
+									orderIndexField.style.display = 'block';
+								}
+							}
 						</script>
 					</div>
 				</div>

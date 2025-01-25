@@ -41,31 +41,44 @@ public class LoginServlet extends HttpServlet {
 	    String account = request.getParameter("account");
 	    String password = request.getParameter("password");
 	    String contextPath = request.getContextPath();
-	    try {
-	        User user = userDao.getUserByAccount(account);
-	        if (user != null && user.getPassword().equals(password)) {
-	            HttpSession session = request.getSession();
-	            session.setAttribute("user_id", user.getId());
-	            session.setAttribute("firstName", user.getFirstName());
-	            session.setAttribute("lastName", user.getLastName());
-	            session.setAttribute("type", user.getType());
-	            session.setAttribute("loggedInUser", user);
-	            
 
-	            if (user.getType().equals("Admin")) {
-	                response.sendRedirect(contextPath + "/Home/index.jsp");
+	    try {
+	        User user = userDao.getUserByAccount(account); // Lấy thông tin người dùng từ cơ sở dữ liệu
+	        if (user != null) {
+	            if ("Unapproved".equalsIgnoreCase(user.getStatus())) {
+	                request.setAttribute("errorMessage", "Invalid username or password");
+	                RequestDispatcher dispatcher = request.getRequestDispatcher("Login/login.jsp");
+	                dispatcher.forward(request, response); // Chuyển hướng tới trang login với thông báo lỗi
+	                return; // Kết thúc xử lý
+	            }
+	            if (user.getPassword().equals(password)) {
+	                HttpSession session = request.getSession();
+	                session.setAttribute("user_id", user.getId());
+	                session.setAttribute("firstName", user.getFirstName());
+	                session.setAttribute("lastName", user.getLastName());
+	                session.setAttribute("type", user.getType());
+	                session.setAttribute("loggedInUser", user);
+
+	                if ("Admin".equals(user.getType())) {
+	                    response.sendRedirect(contextPath + "/Home/index.jsp");
+	                } else {
+	                    response.sendRedirect(contextPath + "/HomeClientController?action=/listBanners");
+	                }
 	            } else {
-	                response.sendRedirect(contextPath + "/HomeClientController?action=/listBanners");
+	                request.setAttribute("errorMessage", "Invalid username or password");
+	                RequestDispatcher dispatcher = request.getRequestDispatcher("Login/login.jsp");
+	                dispatcher.forward(request, response);
 	            }
 	        } else {
 	            request.setAttribute("errorMessage", "Invalid username or password");
 	            RequestDispatcher dispatcher = request.getRequestDispatcher("Login/login.jsp");
-	            dispatcher.forward(request, response); // Forward to login page with error message
+	            dispatcher.forward(request, response);
 	        }
 	    } catch (SQLException e) {
 	        throw new ServletException("Database error occurred", e);
 	    }
-	}       
+	}
+
 
 }
 

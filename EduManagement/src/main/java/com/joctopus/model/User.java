@@ -47,9 +47,14 @@ public class User{
 	
 	@Column(name = "image")
 	protected String image;
+	
+	@Column(name = "status")
+	protected String status;
 
 	public User() {
 	}
+	
+	
 
 	
 	public User(int id, String firstName, String lastName, LocalDate dob, String gender, String address,
@@ -83,7 +88,7 @@ public class User{
 
 
 	public User(int id, String firstName, String lastName, LocalDate dob, String gender, String address, String phoneNumber,
-			String account, String password, String type, String image) {
+			String account, String password, String type, String image, String status) {
 		super();
 		this.id = id;
 		this.firstName = firstName;
@@ -96,7 +101,28 @@ public class User{
 		this.password = password;
 		this.type = type;
 		this.image = image;
+		this.status = status;
 	}
+	
+	
+
+	public User(String firstName, String lastName, LocalDate dob, String gender, String address, String phoneNumber,
+			String account, String password, String type, String status) {
+		super();
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.dob = dob;
+		this.gender = gender;
+		this.address = address;
+		this.phoneNumber = phoneNumber;
+		this.account = account;
+		this.password = password;
+		this.type = type;
+		this.status = status;
+	}
+
+
+
 
 	public User(String firstName, String lastName, LocalDate dob, String gender, String address, String phoneNumber,
 			String account, String password, String type) {
@@ -113,7 +139,7 @@ public class User{
 	}
 	
 	public User(String firstName, String lastName, LocalDate dob, String gender, String address, String phoneNumber,
-			String account, String password, String type, String image) {
+			String account, String password, String type, String image, String status) {
 		super();
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -125,6 +151,7 @@ public class User{
 		this.password = password;
 		this.type = type;
 		this.image = image;
+		this.status = status;
 	}
 
 	// Getters and setters
@@ -240,4 +267,17 @@ public class User{
 		this.image = image;
 	}
 
+
+
+
+	public String getStatus() {
+		return status;
+	}
+
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	
 }

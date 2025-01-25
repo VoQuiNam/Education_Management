@@ -147,6 +147,7 @@ public class ProfileUserController extends HttpServlet {
 		String account = request.getParameter("account");
 		String password = request.getParameter("password");
 		String type = request.getParameter("type");
+		 String status = request.getParameter("status");
 
 		boolean isUnchanged = first_name.equals(currentUser.getFirstName())
 				&& last_name.equals(currentUser.getLastName())

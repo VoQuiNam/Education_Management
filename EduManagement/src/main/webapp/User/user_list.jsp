@@ -20,16 +20,16 @@
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
 	<c:if test="${not empty sessionScope.errorMessage}">
-    <script>
-        Swal.fire({
-            icon: 'error',
-            title: 'Error!',
-            text: '${sessionScope.errorMessage}'
-        });
-    </script>
-    <!-- Clear the error message from the session -->
-    <c:remove var="errorMessage" scope="session" />
-</c:if>
+		<script>
+			Swal.fire({
+				icon : 'error',
+				title : 'Error!',
+				text : '${sessionScope.errorMessage}'
+			});
+		</script>
+		<!-- Clear the error message from the session -->
+		<c:remove var="errorMessage" scope="session" />
+	</c:if>
 
 
 	<div class="wrapper">
@@ -70,14 +70,15 @@
 												<tbody>
 													<c:forEach var="user" items="${listUser}">
 														<tr>
-															<td><img src="${user.image}"
-																	alt="User Image" style="width: 100px; height: auto;" /></td>
+															<td><img src="${user.image}" alt="User Image"
+																style="width: 100px; height: auto;" /></td>
 															<td><c:out value="${user.firstName}" /></td>
 															<td><c:out value="${user.lastName}" /></td>
 															<td><c:out value="${user.dob}" /></td>
 															<td><c:out value="${user.gender}" /></td>
 															<td><c:out value="${user.address}" /></td>
 															<td><c:out value="${user.type}" /></td>
+															<td><c:out value="${user.status}" /></td>
 															<td class="action-buttons"><a
 																href="<%=request.getContextPath()%>/UserController?action=/edit&id=${user.id}"
 																class="btn btn-warning">Edit</a> <a

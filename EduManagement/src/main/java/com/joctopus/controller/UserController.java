@@ -132,6 +132,7 @@ public class UserController extends HttpServlet {
 		String account = request.getParameter("account");
 		String password = request.getParameter("password");
 		String type = request.getParameter("type");
+		String status = request.getParameter("status");
 
 		// Kiểm tra xem tài khoản và số điện thoại mới có trùng với thông tin hiện tại
 		// của người dùng không
@@ -261,6 +262,7 @@ public class UserController extends HttpServlet {
 		request.setAttribute("password", password);
 		request.setAttribute("type", type);
 		request.setAttribute("image", filePart);
+		request.setAttribute("status", filePart);
 
 
 		// Nếu có lỗi, hiển thị lại form với thông báo lỗi
@@ -271,7 +273,7 @@ public class UserController extends HttpServlet {
 		}
 
 		User updateUser = new User(id, first_name, last_name, DOB, gender, address, phone_number, account, password,
-				type, dbFileName);
+				type, dbFileName, status);
 
 		usersDAO.updateUser(updateUser);
 
@@ -432,7 +434,7 @@ public class UserController extends HttpServlet {
 			// Đặt biến hasError thành true để biểu thị rằng có lỗi được phát hiện
 			hasError = true;
 		}
-
+		String status = request.getParameter("status");
 		// Handle file upload
 		String uploadPath = getServletContext().getRealPath("") + File.separator + "images";
 		File uploadDir = new File(uploadPath);
@@ -458,7 +460,7 @@ public class UserController extends HttpServlet {
 		// đến trang danh sách
 		LocalDate dob = LocalDate.parse(dobParam);
 		User newUser = new User(first_name, last_name, dob, gender, address, phone_number, account, password, type,
-				dbFileName);
+				dbFileName, status);
 		usersDAO.insertUser(newUser);
 		response.sendRedirect("UserController?action=/list");
 	}
