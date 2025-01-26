@@ -1,7 +1,5 @@
 package com.joctopus.util;
 
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
 
@@ -14,20 +12,8 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 public class EmailUtil {
-	 	private static String from;
-	    private static String password;
-
-	    static {
-	        try {
-	            Properties props = new Properties();
-	            props.load(new FileInputStream("src/main/javaconfig.properties"));
-	            from = props.getProperty("email");
-	            password = props.getProperty("password");
-	        } catch (IOException e) {
-	            e.printStackTrace();
-	            System.out.println("Lỗi khi đọc file cấu hình!");
-	        }
-	    }
+		static final String from = "voquinamit@gmail.com";
+		static final String password = "czykwfboaiftkeym";
 
 		public static boolean sendEmail(String to, String tieuDe, String noiDung) {
 			// Properties : khai báo các thuộc tính
