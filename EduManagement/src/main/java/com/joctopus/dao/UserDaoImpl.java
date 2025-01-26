@@ -346,5 +346,38 @@ public class UserDaoImpl implements UserDao{
         return isRegistered;
     }
 	
-	
+    @Override
+    public boolean updatePassword(String email, String newPassword) throws SQLException {
+        Transaction transaction = null;
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        try {
+            // Start a transaction
+            transaction = session.beginTransaction();
+            
+            // Query the user by email
+            Query<User> query = session.createQuery("FROM User WHERE account = :account", User.class);
+            query.setParameter("account", email);
+            User user = query.uniqueResult();
+            
+            if (user != null) {
+                // Update the password
+                user.setPassword(newPassword);
+                session.update(user);
+                
+                // Commit the transaction
+                transaction.commit();
+                return true;
+            }
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+        return false;
+    }
+
+
 }

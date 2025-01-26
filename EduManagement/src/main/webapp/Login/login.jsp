@@ -90,7 +90,7 @@
         <c:if test="${not empty errorMessage}">
             <p style="color: red;"><c:out value="${errorMessage}"/></p>
         </c:if>
-        <a href="#">Forgot password?</a>
+        <a href="<%=request.getContextPath()%>/sendResetCode">Forgot password?</a>
         <div class="register-link">
             <span>Don't have an account?</span> <a href="<%=request.getContextPath()%>/register">Register</a>
         </div>

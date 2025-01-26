@@ -31,7 +31,11 @@ public interface UserDao {
 	 boolean isUserRegisteredForClass(User user, Classes classes) throws SQLException;
 	 
 	 public boolean checkIfUserHasClasses(int userId) throws SQLException;
+	 
 	 public boolean checkIfUserIsEnrolledInClass(int userId);
 	 
+	 boolean updatePassword(String email, String newPassword) throws SQLException;
+
+
 	 
 }

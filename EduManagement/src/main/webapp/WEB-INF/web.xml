@@ -18,4 +18,34 @@
     <servlet-name>NotificationAdminDaoImpl</servlet-name>
     <url-pattern>/NotificationAdminDaoImpl</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>ForgotPasswordController</display-name>
+    <servlet-name>ForgotPasswordController</servlet-name>
+    <servlet-class>com.joctopus.controller.ForgotPasswordController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ForgotPasswordController</servlet-name>
+    <url-pattern>/ForgotPasswordController</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>VerifyCodeController</display-name>
+    <servlet-name>VerifyCodeController</servlet-name>
+    <servlet-class>com.joctopus.controller.VerifyCodeController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>VerifyCodeController</servlet-name>
+    <url-pattern>/VerifyCodeController</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>ResetPasswordController</display-name>
+    <servlet-name>ResetPasswordController</servlet-name>
+    <servlet-class>com.joctopus.controller.ResetPasswordController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ResetPasswordController</servlet-name>
+    <url-pattern>/ResetPasswordController</url-pattern>
+  </servlet-mapping>
 </web-app>
