@@ -444,10 +444,16 @@ public class UserController extends HttpServlet {
 
 		Part filePart = request.getPart("image");
 		String fileName = extractFileName(filePart);
-		String filePath = uploadPath + File.separator + fileName;
 
-		filePart.write(filePath); // Save file to the specified directory
-		String dbFileName = "images/" + fileName;
+		// Nếu người dùng không tải ảnh lên, sử dụng ảnh mặc định
+		String dbFileName;
+		if (fileName == null || fileName.isEmpty()) {
+		    dbFileName = "images/default.jpg"; // Đường dẫn ảnh mặc định
+		} else {
+		    String filePath = uploadPath + File.separator + fileName;
+		    filePart.write(filePath); // Lưu file vào thư mục chỉ định
+		    dbFileName = "images/" + fileName;
+		}
 
 		// Nếu có lỗi, hiển thị lại form với thông báo lỗi
 		if (hasError) {

@@ -81,6 +81,7 @@
             <input type="email" name="email" placeholder="Enter your email" required>
             <button type="submit">Send Code</button>
         </form>
+        
         <a href="<%=request.getContextPath()%>/login">Back to Login</a>
     </div>
 </body>

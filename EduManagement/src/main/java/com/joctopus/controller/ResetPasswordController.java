@@ -26,6 +26,12 @@ public class ResetPasswordController extends HttpServlet {
 
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		 // Lấy thông báo lỗi từ session (nếu có)
+        String errorMessage = (String) request.getSession().getAttribute("errorMessage");
+        request.setAttribute("errorMessage", errorMessage);
+
+        // Xóa thông báo lỗi khỏi session để tránh hiển thị lại
+        request.getSession().removeAttribute("errorMessage");
 		RequestDispatcher dispatcher = request.getRequestDispatcher("ForgotPassword/resetPassword.jsp");
 	    dispatcher.forward(request, response);
 	}
@@ -43,20 +49,17 @@ public class ResetPasswordController extends HttpServlet {
 	                request.getSession().invalidate(); // Clear session
 	                response.sendRedirect(request.getContextPath() + "/login");
 	            } else {
-	                request.setAttribute("errorMessage", "Failed to reset password. Please try again.");
-	                RequestDispatcher dispatcher = request.getRequestDispatcher("ForgotPassword/resetPassword.jsp");
-	                dispatcher.forward(request, response);
+	                request.getSession().setAttribute("errorMessage", "Failed to reset password. Please try again.");
+	                response.sendRedirect(request.getContextPath() + "/resetPassword");
 	            }
 	        } catch (SQLException e) {
 	            e.printStackTrace();
 	            request.setAttribute("errorMessage", "An error occurred. Please try again.");
-	            RequestDispatcher dispatcher = request.getRequestDispatcher("ForgotPassword/resetPassword.jsp");
-	            dispatcher.forward(request, response);
+	            response.sendRedirect(request.getContextPath() + "/resetPassword");
 	        }
 	    } else {
-	        request.setAttribute("errorMessage", "Passwords do not match.");
-	        RequestDispatcher dispatcher = request.getRequestDispatcher("ForgotPassword/resetPassword.jsp");
-	        dispatcher.forward(request, response);
+	        request.getSession().setAttribute("errorMessage", "Passwords do not match.");
+	        response.sendRedirect(request.getContextPath() + "/resetPassword");
 	    }
 	}
 

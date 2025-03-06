@@ -71,7 +71,7 @@ if (userIdStr != null) {
 				}
 				}
 				%>
-				<li class="navbar-item"><a href="#" class="navbar-link"
+				<li class="navbar-item"><a href="<%=request.getContextPath()%>/ContactController?action=/newCon" class="navbar-link"
 					data-nav-link>Contact</a></li>
 
 			</ul>

@@ -87,6 +87,17 @@ body {
 				placeholder="Confirm new password" required>
 			<button type="submit">Reset Password</button>
 		</form>
+		<!-- Hiển thị thông báo lỗi nếu có -->
+		<%
+		String errorMessage = (String) request.getAttribute("errorMessage");
+		if (errorMessage != null) {
+		%>
+		<div class="error-message" style="color: red; margin-bottom: 10px;">
+			<%=errorMessage%>
+		</div>
+		<%
+		}
+		%>
 	</div>
 
 </body>

@@ -42,6 +42,14 @@
 							<div class="card">
 								<div class="card-header">
 									<h1>Account List</h1>
+									<div class="input-group" style="max-width: 300px; float: right;">
+										<input type="text" id="searchInput" class="form-control"
+											placeholder="Search...">
+										<div class="input-group-append">
+											<button class="btn btn-secondary" type="button"
+												onclick="searchTable()" style="">Search</button>
+										</div>
+									</div>
 									<a
 										href="<%=request.getContextPath()%>/UserController?action=/new"
 										class="btn btn-primary">Add</a>

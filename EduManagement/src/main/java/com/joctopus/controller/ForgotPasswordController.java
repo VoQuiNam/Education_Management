@@ -45,7 +45,7 @@ public class ForgotPasswordController extends HttpServlet {
 	            response.sendRedirect(request.getContextPath() + "/verifyResetCode");
 	        } else {
 	            request.setAttribute("errorMessage", "Failed to send email. Please try again.");
-	            request.getRequestDispatcher("/forgotPassword").forward(request, response);
+	            request.getRequestDispatcher("ForgotPassword/forgotPassword").forward(request, response);
 	        }
 	    }
 
